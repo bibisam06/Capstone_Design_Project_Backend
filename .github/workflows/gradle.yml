@@ -42,12 +42,6 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build -x test
 
-     - name: Generate Keystore file from Github Secrets
-      run: |
-    echo "$KEYSTORE" > ./keystore/keystore.b64
-    base64 -d -i ./keystore/keystore.b64 > keystore.p12
-  env:
-    KEYSTORE: ${{ secrets.SECRET_KEY_STORE_KEY }}
 
     - name: Decrypt keystore
       run: |
