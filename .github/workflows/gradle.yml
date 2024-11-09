@@ -40,7 +40,7 @@ jobs:
 
       - name: SCP를 사용하여 keystore 파일 EC2로 전송
         run: |
-          scp -i dobee-web.pem -o StrictHostKeyChecking=no keystore.p12 ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i ~/Capstone_Design_Project?Backend/dobee-web.pem -o StrictHostKeyChecking=no ~/Capstone_Design_Project?Backend/keystore.p12 ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
 
   dependency-submission:
     runs-on: ubuntu-latest
