@@ -38,6 +38,11 @@ out/
 
 # Ignore application.properties file
 src/main/resources/application-db.properties
+
 keystore-64bit.txt
 keystore.p12
+keystore_base64.txt
+truststore
+keystore
+sssl.cer
 

@@ -43,10 +43,13 @@ jobs:
       run: ./gradlew build -x test
 
 
-    - name: Decrypt keystore
+    - name: Decode and upload keystore file
+      env:
+        KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       run: |
-        echo "${{ secrets.SECRET_KEY_STORE_KEY }}" > keystore.p12
-        # 이후 keystore.p12 파일을 사용하는 명령어 추가
+        echo "$KEYSTORE_BASE64" | base64 --decode > keystore.p12
+        scp -i ${{ secrets.SECRET_KEY_STORE_KEY }} keystore.p12 ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/
+
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
     #
