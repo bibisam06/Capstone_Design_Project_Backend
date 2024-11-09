@@ -35,7 +35,7 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.p12
-          scp -i ${{ secrets.SECRET_KEY_STORE_KEY }} keystore.p12 ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/
+          scp -i ${{ secrets.EC2_KEY }} keystore.p12 ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/
 
   dependency-submission:
     runs-on: ubuntu-latest
