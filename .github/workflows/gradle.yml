@@ -32,18 +32,18 @@ jobs:
 
       - name: keystore 파일 디코딩 및 업로드
         env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_BASE64: ${{ secrets.EC2_KEY }}
         run: |
           # keystore.p12 파일을 base64로 디코딩하여 저장
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.p12
 
       - name: EC2 비밀 키 저장
         env:
-          EC2_KEY: ${{ secrets.EC2_KEY }}
+          EC2_KEY: ${{ secrets.EC2_KEY1 }}
         run: |
           # EC2 비밀 키를 ec2-key.pem 파일로 저장
           echo "$EC2_KEY" > ec2-key.pem
-          chmod 600 ec2-key.pem
+          chmod 400 ec2-key.pem
 
       - name: SCP를 사용하여 keystore 파일 EC2로 전송
         run: |
