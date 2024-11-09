@@ -35,7 +35,13 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.p12
-          scp -i ${{ secrets.EC2_KEY }} keystore.p12 ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/
+
+        # Save the EC2 private key to a PEM file
+          echo "$EC2_KEY" > ec2-key.pem
+          chmod 600 ec2-key.pem
+
+    # Upload keystore.p12 to EC2 instance using SCP
+          scp -i ec2-key.pem -o StrictHostKeyChecking=no keystore.p12 ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/
 
   dependency-submission:
     runs-on: ubuntu-latest
