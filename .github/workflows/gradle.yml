@@ -37,17 +37,10 @@ jobs:
           # keystore.p12 파일을 base64로 디코딩하여 저장
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.p12
 
-      - name: EC2 비밀 키 저장
-        env:
-          EC2_KEY: ${{ secrets.EC2_KEY1 }}
-        run: |
-          # EC2 비밀 키를 ec2-key.pem 파일로 저장
-          echo "$EC2_KEY1" > ec2-key.pem
-          chmod 400 ec2-key.pem
 
       - name: SCP를 사용하여 keystore 파일 EC2로 전송
         run: |
-          scp -i ec2-key.pem -o StrictHostKeyChecking=no keystore.p12 ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i dobee-web.pem -o StrictHostKeyChecking=no keystore.p12 ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
 
   dependency-submission:
     runs-on: ubuntu-latest
