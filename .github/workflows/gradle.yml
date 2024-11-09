@@ -42,7 +42,7 @@ jobs:
           EC2_KEY: ${{ secrets.EC2_KEY1 }}
         run: |
           # EC2 비밀 키를 ec2-key.pem 파일로 저장
-          echo "$EC2_KEY" > ec2-key.pem
+          echo "$EC2_KEY1" > ec2-key.pem
           chmod 400 ec2-key.pem
 
       - name: SCP를 사용하여 keystore 파일 EC2로 전송
