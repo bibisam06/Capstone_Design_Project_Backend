@@ -15,35 +15,61 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # .pem 파일을 base64로 디코딩하고 파일 권한 설정
+      - name: .pem 파일 디코딩 및 설정
+        env:
+          PEM_KEY_BASE64: ${{ secrets.EC2_PEM_KEY }}
+        run: |
+          echo "$PEM_KEY_BASE64" | base64 --decode > dobee-web.pem
+          chmod 400 dobee-web.pem
+
+      # SSH 연결을 사용하여 EC2 인스턴스에 접근
+      - name: SSH 연결
+        run: |
+          ssh -i "dobee-web.pem" -o StrictHostKeyChecking=no ubuntu@ec2-13-124-83-135.ap-northeast-2.compute.amazonaws.com << 'EOF'
+          echo "SSH 연결 성공"
+          EOF
+
+      # JDK 17 설정
       - name: JDK 17 설정
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'corretto'
 
+      # Gradle 설정
       - name: Gradle 설정
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
+      # Gradle 실행 권한 부여
       - name: Gradle 실행 권한 부여
         run: chmod +x ./gradlew
 
+      # Gradle 빌드 실행
       - name: Gradle 빌드
         run: ./gradlew build -x test
 
+      # keystore 파일을 base64로 디코딩하여 저장
       - name: keystore 파일 디코딩 및 업로드
         env:
           KEYSTORE_BASE64: ${{ secrets.EC2_KEY }}
         run: |
-          # keystore.p12 파일을 base64로 디코딩하여 저장
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.p12
 
-
-      - name: 퍼블릭키 업로드
-
+      # SCP를 사용하여 keystore 파일 EC2로 전송
       - name: SCP를 사용하여 keystore 파일 EC2로 전송
         run: |
           scp -v -i dobee-web.pem -o StrictHostKeyChecking=no keystore ubuntu@ec2-13-124-83-135.ap-northeast-2.compute.amazonaws.com:/home/ubuntu/
 
+      # 빌드 후 배포
+      - name: 빌드 후 배포
+        run: |
+          nohup java -jar dobee-0.0.1.SNAPSHOT.jar&
+
+      # 배포 후 로그 확인
+      - name: 캣 명령어
+        run: |
+          cat nohup.out
 
   dependency-submission:
     runs-on: ubuntu-latest
