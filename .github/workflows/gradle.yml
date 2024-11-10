@@ -34,7 +34,7 @@ jobs:
       # SSH 연결을 사용하여 EC2 인스턴스에 접근
       - name: SSH 연결
         run: |
-          ssh -i "dobee_back_server_key.pem" ubuntu@ec2-13-124-83-135.ap-northeast-2.compute.amazonaws.com
+          ssh -t -i "dobee-web.pem" ubuntu@ec2-13-124-83-135.ap-northeast-2.compute.amazonaws.com
           echo "SSH 연결 성공"
           EOF
 

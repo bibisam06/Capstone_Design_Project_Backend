@@ -46,3 +46,5 @@ truststore
 keystore
 sssl.cer
 dobee-web.pem
+trustServer.cer
+server
