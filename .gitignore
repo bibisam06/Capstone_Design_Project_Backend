@@ -40,7 +40,7 @@ out/
 src/main/resources/application-db.properties
 
 keystore-64bit.txt
-keystore.p12
+src/main/resources/keystore.p12
 keystore_base64.txt
 truststore
 keystore
@@ -48,3 +48,6 @@ sssl.cer
 dobee-web.pem
 trustServer.cer
 server
+dobee-web.ppk
+dobeeweb
+dobeeweb.pub

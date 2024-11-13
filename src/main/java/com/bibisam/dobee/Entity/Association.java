@@ -18,7 +18,7 @@ public class Association {
             name = "ASSO_SEQ_GEN",         // 시퀀스 생성기 이름
             sequenceName = "ASSO_SEQ",     // 실제 DB에 저장될 시퀀스 이름
             initialValue = 1,              // 초기값 1
-            allocationSize = 1             // 매번 1씩 증가
+            allocationSize = 1
     )
 
 

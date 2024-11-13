@@ -15,28 +15,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # .pem 파일을 base64로 디코딩하고 파일 권한 설정
+      # GitHub Secret에서 PEM 키 불러오기
       - name: .pem 파일 디코딩 및 설정
         env:
-          PEM_KEY_BASE64: ${{ secrets.EC2_PEM_KEY }}
+          PEM_KEY_BASE64: ${{ secrets.SSH_KEY }}
         run: |
           echo "$PEM_KEY_BASE64" | base64 --decode > dobee-web.pem
           chmod 400 dobee-web.pem
 
-      # GitHub Secret에서 SSH 키를 불러와 PEM 파일로 디코딩 후 권한 설정
-      - name: .pem 파일 디코딩 및 설정
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.dobee_back_server_key }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" | base64 --decode > dobee_back_server_key.pem
-          chmod 400 dobee_back_server_key.pem
-
-      # SSH 연결을 사용하여 EC2 인스턴스에 접근
-      - name: SSH 연결
-        run: |
-          ssh -t -i "dobee-web.pem" ubuntu@ec2-13-124-83-135.ap-northeast-2.compute.amazonaws.com
-          echo "SSH 연결 성공"
-          EOF
+#      # SSH 연결 테스트
+#      - name: SSH 연결 테스트
+#        run: |
+#          ssh -o StrictHostKeyChecking=no -i dobeeweb ubuntu@ec2-13-124-83-135.ap-northeast-2.compute.amazonaws.com echo "SSH 연결 성공"
 
       # JDK 17 설정
       - name: JDK 17 설정
@@ -64,20 +54,13 @@ jobs:
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.p12
 
-      # SCP를 사용하여 keystore 파일 EC2로 전송
-      - name: SCP를 사용하여 keystore 파일 EC2로 전송
-        run: |
-          scp -v -i dobee-web.pem -o StrictHostKeyChecking=no keystore ubuntu@ec2-13-124-83-135.ap-northeast-2.compute.amazonaws.com:/home/ubuntu/
 
       # 빌드 후 배포
       - name: 빌드 후 배포
         run: |
-          nohup java -jar dobee-0.0.1.SNAPSHOT.jar&
+          nohup java -jar /home/ubuntu/dobee-0.0.1.SNAPSHOT.jar &
+          
 
-      # 배포 후 로그 확인
-      - name: 캣 명령어
-        run: |
-          cat nohup.out
 
   dependency-submission:
     runs-on: ubuntu-latest

@@ -11,16 +11,12 @@ import com.bibisam.dobee.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.webresources.EmptyResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -156,7 +152,21 @@ public class UserController {
 
     //비밀번호 수정
     @PostMapping("/change-pw")
-    public void changePw(@RequestBody String userId) {
+    public ResponseEntity<Map<String, Object>> changePw(@RequestBody String userId, String userPw) {
+        Map<String, Object> response = new HashMap<>();
+        Users findUser = userService.findByUserId(userId);
+        if(findUser == null){
+            response.put("message", "해당 유저가 존재하지 않습니다.");
+            response.put("userId", userId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        else { //해당 유저 조회성공 한 경우,
+            findUser.setUserPw(userPw);
+            response.put("message","해당 유저를 조회 성공하였습니다.");
+            response.put("status", "200");
+            response.put("new password", findUser.getUserPw());
+            return ResponseEntity.ok(response);
+        }
 
         
     }
