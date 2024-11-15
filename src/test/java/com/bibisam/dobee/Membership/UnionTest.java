@@ -43,4 +43,10 @@ public class UnionTest {
     public void createRequest(){
 
     }
+
+    @Test
+    @DisplayName("가입가능 조합 리스트 기능")
+    public void checkList(){
+
+    }
 }

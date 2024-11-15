@@ -22,9 +22,10 @@ public class VoteController {
 
     //TODO : 투표 생성
     @PostMapping("/create-vote")
-    public ResponseEntity<Map<String,String>> createVote(@RequestHeader("Allow")VoteStatus voteStatus, @Validated @RequestBody VoteRequestDTO requestDTO) {
+    public ResponseEntity<Map<String,String>> createVote( @Validated @RequestBody VoteRequestDTO requestDTO) {
         Map<String, String> response = new HashMap<>();
         // if pre_creation -> 동의 투표 진행
+        VoteStatus voteStatus = requestDTO.getVoteStatus();
         if (voteStatus == VoteStatus.PRE_CREATION) {
             // 동의 투표 생성 로직
             Vote vote = voteService.ceateVote(requestDTO);
@@ -32,7 +33,7 @@ public class VoteController {
             // 동의 투표 처리 로직 추가
         }
         // else -> 일반 투표 생성
-        else if (voteStatus == VoteStatus.POST_CREATION) {
+        else if (voteStatus  == VoteStatus.POST_CREATION) {
             // 일반 투표 생성 로직
             voteService.ceateVote(requestDTO);
             response.put("status", "일반 투표 생성됨");
@@ -45,4 +46,12 @@ public class VoteController {
 
         return ResponseEntity.ok(response);
     }
+
+    //TODO : 투표하기
+    @GetMapping("/voting")
+    public void voting(){
+
+
+    }
+
 }

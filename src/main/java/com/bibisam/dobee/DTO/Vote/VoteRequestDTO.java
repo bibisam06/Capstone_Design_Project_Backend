@@ -25,6 +25,7 @@ public class VoteRequestDTO {
     String agenda;
 
     LocalDateTime startDate;
+
     LocalDateTime endDate;
     AssociationStatus associationstatus;
     VoteStatus voteStatus;

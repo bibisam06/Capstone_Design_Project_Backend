@@ -14,6 +14,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class AssociationService {
+
     @Autowired
     private AssociationRepository associationRepository;
 
@@ -21,6 +22,7 @@ public class AssociationService {
     public List<Association> getAllAssociations() {
         return associationRepository.findAll();
     }
+
     public Association createAssociation(AssociationRequest request) {
         return associationRepository.save(request.toEntity());
     }

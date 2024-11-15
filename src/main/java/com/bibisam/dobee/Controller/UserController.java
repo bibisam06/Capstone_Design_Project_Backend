@@ -37,9 +37,10 @@ public class UserController {
     @Autowired
     private EmailService emailService;
 
+    //TODO : 전역에러, 커스텀에러 등 처리 ,어노테이션
     //회원가입
     @PostMapping("/join")
-    public ResponseEntity<Map<String, Object>> join(@Validated @RequestBody JoinRequest request){
+    public ResponseEntity<Map<String, Object>> join(@Validated @RequestBody JoinRequest request) {
 
        Map<String, Object> response = new HashMap<>();
         try{
@@ -60,15 +61,13 @@ public class UserController {
     }
 
     //세션확인하기
-    @GetMapping("/")
+    @GetMapping("/check-session")
     public ResponseEntity<Map<String, Object>> findLogedInUser(@SessionAttribute(name="loginUser",required=false) String userId){
         Map<String, Object> response = new HashMap<>();
        // System.out.println(logedMember.getUserName());
         if(userId == null){
-            System.out.println("없는디");
             return ResponseEntity.ok(response);
         }
-        System.out.println("있다 : " + userId);
         response.put("user", userId);
         return ResponseEntity.ok(response);
     }

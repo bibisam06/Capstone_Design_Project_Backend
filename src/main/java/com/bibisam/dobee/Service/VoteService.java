@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 public class VoteService {
 
     @Autowired
-    private VoteRepository voteRepository;
+    private final VoteRepository voteRepository;
+    @Autowired
     private final VoteOptionRepository voteOptionRepository;
 
     //투표 생성

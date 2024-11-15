@@ -5,17 +5,15 @@ import com.bibisam.dobee.Entity.Association;
 import com.bibisam.dobee.Entity.Enum.AssociationStatus;
 import com.bibisam.dobee.Entity.Enum.UserStatus;
 import com.bibisam.dobee.Entity.Users;
-import com.bibisam.dobee.Repository.UserRepository;
-import com.bibisam.dobee.Repository.VoteRepository;
 import com.bibisam.dobee.Service.AssociationService;
 import com.bibisam.dobee.Service.AuthService;
 import com.bibisam.dobee.Service.UserService;
+import com.bibisam.dobee.Service.VoteService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@ControllerAdvice
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/association")
@@ -31,12 +30,13 @@ public class AssociationController {
 
     @Autowired
     private AssociationService associationService;
+
     @Autowired
-    private VoteRepository voteRepository;
+    VoteService voteService;
+
     @Autowired
     private AuthService authService;
-    @Autowired
-    private UserRepository userRepository;
+
     @Autowired
     private UserService userService;
 
@@ -62,15 +62,13 @@ public class AssociationController {
         }
     }
 
-    //TODO: 신청 가능한 조합리스트 가져오기.
     @GetMapping("/check-to-join")
     public ResponseEntity<List<Association>> requestToJoin() {
         List<Association> list = associationService.getAllAssociations();
-
         return ResponseEntity.ok(list);
     }
 
-    //가입여부확인 -> 첫화면 어캐나올지 ..
+    //가입여부확인 -> 첫화면
     @GetMapping("/is/member")
     public boolean isMember(@RequestParam String userId){
         return authService.isMember(userId);
@@ -96,6 +94,7 @@ public class AssociationController {
 
         return ResponseEntity.ok("approve to join request success ");
     }
+
     //TODO:조합 가입 거절
     @GetMapping("/decline-to-join")
     public void declineToJoin(@RequestParam int associationId, String userId) {

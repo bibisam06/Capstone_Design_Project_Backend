@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VoteOptionRepository extends JpaRepository<Vote_options, Integer> {
 
-   // Vote_options save(Vote_options vote_options);
 }

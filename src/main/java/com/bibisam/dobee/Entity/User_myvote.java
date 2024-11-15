@@ -17,6 +17,10 @@ public class User_myvote {
 
     Timestamp vote_time;
 
+    @Column(name="result")
+    private String result;
+    
+    //JPA 연관관계 매핑
     @ManyToOne
     @JoinColumn(name="user_id")
     private Users users;
@@ -24,4 +28,5 @@ public class User_myvote {
     @OneToOne
     @JoinColumn(name="vote_id")
     private Vote vote;
+    
 }
