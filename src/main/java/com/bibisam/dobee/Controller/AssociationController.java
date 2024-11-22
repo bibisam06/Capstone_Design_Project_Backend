@@ -16,8 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +75,6 @@ public class AssociationController {
     // 1. 조합원이 가입 요청을 보내는 API
     @PostMapping("/request")
     public ResponseEntity<String> requestMembership(@RequestParam String userId) {
-        //TODO : 이미 가입되어있는 경우, 에러메세지 나오게
         Users user = userService.findByUserId(userId);
         user.setUserStatus(UserStatus.PENDING);
       return ResponseEntity.ok("join request success ");

@@ -177,7 +177,7 @@ public class UserController {
         log.info("sendMail code : {}, message : {}", HttpStatus.OK, HttpStatus.OK.getReasonPhrase());
         ResponseDto responseDto = ResponseDto.of(HttpStatus.OK, HttpStatus.OK.getReasonPhrase());
 
-        // ResponseEntity로 반환
+
         return ResponseEntity.ok(responseDto);
     }
 

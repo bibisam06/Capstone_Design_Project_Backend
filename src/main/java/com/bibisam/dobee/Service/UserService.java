@@ -24,12 +24,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
+
     private UserRepository userRepository;
-    @Autowired
+
     private PasswordEncoder encoder;
 
-    @Autowired
     private AssociationRepository associationRepository;
 
 
