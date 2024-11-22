@@ -40,13 +40,14 @@ public class AssociationController {
 
 
     //조합생성 api
-    @PostMapping("/new-association")
+    @PostMapping("/new/association")
     public ResponseEntity<Map<String, Object>> newAssociation(@Validated @RequestBody AssociationRequest request) {
         Map<String, Object> response = new HashMap<>();
         try {
             // 서비스 계층을 통해 조합 생성
             Association association = associationService.createAssociation(request);
             //초기엔 조합장 null로 설정해둔뒤, 투표하고나서 결정
+            //TODO : 위도, 경도 두값도 같이 저장하게
             association.setHeadId(null);
             association.setStatus(AssociationStatus.PENDING);
             // 성공 시 응답 반환
@@ -81,7 +82,7 @@ public class AssociationController {
     }
 
     //TODO:조합 가입 승인
-    @GetMapping("/approve-to-join")
+    @GetMapping("/approve/join")
     public ResponseEntity<String> approveToJoin(@RequestParam int associationId, String userId) {
         Association association = associationService.findById(associationId);
         Users user = userService.findByUserId(userId);
@@ -93,7 +94,7 @@ public class AssociationController {
     }
 
     //TODO:조합 가입 거절
-    @GetMapping("/decline-to-join")
+    @GetMapping("/decline/join")
     public void declineToJoin(@RequestParam int associationId, String userId) {
 
     }

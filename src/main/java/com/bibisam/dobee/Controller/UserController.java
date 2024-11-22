@@ -19,10 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
 
 
 @RequiredArgsConstructor
@@ -61,19 +60,19 @@ public class UserController {
     }
 
     //세션확인하기
-    @GetMapping("/check-session")
+    @GetMapping("/check/session")
     public ResponseEntity<Map<String, Object>> findLogedInUser(@SessionAttribute(name="loginUser",required=false) String userId){
         Map<String, Object> response = new HashMap<>();
        // System.out.println(logedMember.getUserName());
         if(userId == null){
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         response.put("user", userId);
         return ResponseEntity.ok(response);
     }
 
     //로그인
-    @PostMapping("/session-login")
+    @PostMapping("/login")
     public ResponseEntity<Map<String ,Object>> sessionLogin(@Valid @ModelAttribute LoginRequest loginRequest, HttpServletRequest req){
         Users user = userService.login(loginRequest);
         Map<String, Object> response = new HashMap<>();
@@ -96,10 +95,14 @@ public class UserController {
     }
 
     //로그아웃
-    @GetMapping("/session-logout")
+    @GetMapping("/logout")
     public ResponseEntity<Map<String,Object>> sessionLogout(HttpSession session) throws Exception{
        Map<String, Object> response = new HashMap<>();
        try{
+           if(session != null) {
+               System.out.println("세션 존재함");
+               session.invalidate();
+           }
            response.put("success", "sessionLogout successed");
            return ResponseEntity.ok(response);
        }catch(Exception e){
@@ -116,7 +119,7 @@ public class UserController {
     }
 
     //아이디 찾기
-    @GetMapping("/find-id")
+    @GetMapping("/find_id")
     public ResponseEntity<Map<String, Object>> findMyId(@RequestParam String email) {
         Map<String, Object> response = new HashMap<>();
 
@@ -133,7 +136,7 @@ public class UserController {
 
 
     //비밀번호 찾기-이메일인증은 추후 추가여부 결정
-    @PostMapping("/find-pw")
+    @PostMapping("/find_pw")
     public ResponseEntity<Map<String, Object>> findMyPw(@RequestParam String userId) {
         Map<String, Object> response = new HashMap<>();
         Users userFound = userService.findByUserId(userId);
@@ -150,7 +153,7 @@ public class UserController {
     }
 
     //비밀번호 수정
-    @PostMapping("/change-pw")
+    @PostMapping("/change_pw")
     public ResponseEntity<Map<String, Object>> changePw(@RequestBody String userId, String userPw) {
         Map<String, Object> response = new HashMap<>();
         Users findUser = userService.findByUserId(userId);
@@ -171,7 +174,7 @@ public class UserController {
     }
 
     //이메일 보내기
-    @PostMapping("/send-email")
+    @PostMapping("/send_email")
     public ResponseEntity<ResponseDto> sendEmail(@RequestBody @Validated EmailRequest request){
         emailService.sendEmail(request);
         log.info("sendMail code : {}, message : {}", HttpStatus.OK, HttpStatus.OK.getReasonPhrase());
