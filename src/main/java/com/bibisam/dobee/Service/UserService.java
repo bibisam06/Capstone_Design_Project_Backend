@@ -42,6 +42,10 @@ public class UserService {
         return userRepository.save(request.toEntity(encoder.encode(request.getUserPw())));
     }
 
+    public Users updateUser(Users user) {
+        return userRepository.save(user);
+    }
+
     //로그인
     public Users login(LoginRequest req) {
         Optional<Users> optionalUser = userRepository.findByUserId(req.getUserId());

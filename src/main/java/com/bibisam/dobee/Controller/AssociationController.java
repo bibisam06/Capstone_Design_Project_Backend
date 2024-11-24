@@ -1,5 +1,6 @@
 package com.bibisam.dobee.Controller;
 
+import com.bibisam.dobee.DTO.Association.AssociationJoinRequest;
 import com.bibisam.dobee.DTO.Association.AssociationRequest;
 import com.bibisam.dobee.Entity.Association;
 import com.bibisam.dobee.Entity.Enum.AssociationStatus;
@@ -93,7 +94,7 @@ public class AssociationController {
         }
     }
 
-
+    //가입가능한 조합 리스트 확인
     @GetMapping("/check-to-join")
     public ResponseEntity<List<Association>> requestToJoin() {
         List<Association> list = associationService.getAllAssociations();
@@ -108,13 +109,14 @@ public class AssociationController {
 
     // 1. 조합원이 가입 요청을 보내는 API
     @PostMapping("/request")
-    public ResponseEntity<String> requestMembership(@RequestParam String userId) {
-        Users user = userService.findByUserId(userId);
+    public ResponseEntity<String> requestMembership(@RequestBody AssociationJoinRequest request) {
+        Users user = userService.findByUserId(request.getUserId());
         user.setUserStatus(UserStatus.PENDING);
+        userService.updateUser(user);
       return ResponseEntity.ok("join request success ");
     }
 
-    //TODO:조합 가입 승인
+    //조합 가입 승인 api
     @GetMapping("/approve/join")
     public ResponseEntity<String> approveToJoin(@RequestParam int associationId, String userId) {
         Association association = associationService.findById(associationId);
@@ -122,18 +124,19 @@ public class AssociationController {
 
         user.setUserStatus(UserStatus.AFTER_JOIN);
         user.setAssociation(association);
-
+        //바뀐값 update
+        userService.updateUser(user);
         return ResponseEntity.ok("approve to join request success ");
     }
 
     //TODO:조합 가입 거절
     @GetMapping("/decline/join")
     public void declineToJoin(@RequestParam int associationId, String userId) {
-
+        //todo : 테이블에서 삭제(대기명단테이블)
     }
     //TODO : 조합의 가입 요청 리스트 확인
     @GetMapping("/request/list")
-    public ResponseEntity<List<Users>> requestList(int associationId) {
+    public ResponseEntity<List<Users>> requestList(@RequestParam int associationId) {
         try {
             List<Users> userList = userService.findByAssociation(associationId);
 
