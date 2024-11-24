@@ -10,6 +10,9 @@ import com.bibisam.dobee.Service.AuthService;
 import com.bibisam.dobee.Service.UserService;
 import com.bibisam.dobee.Service.VoteService;
 import jakarta.persistence.EntityNotFoundException;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,27 +42,57 @@ public class AssociationController {
     private UserService userService;
 
 
-    //조합생성 api
     @PostMapping("/new/association")
-    public ResponseEntity<Map<String, Object>> newAssociation(@Validated @RequestBody AssociationRequest request) {
+    public ResponseEntity<Map<String, Object>> newAssociation(
+            @Validated @RequestBody AssociationRequest request,
+            HttpServletRequest httpRequest) {
         Map<String, Object> response = new HashMap<>();
+
+        // 쿠키 받아오기
+        Cookie[] cookies = httpRequest.getCookies();
+        if (cookies == null || cookies.length == 0) {
+            response.put("error", "No cookies found. Please log in first.");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        String sessionIdFromCookie = null;
+        for (Cookie cookie : cookies) {
+            if ("JSESSIONID".equals(cookie.getName())) { // JSESSIONID는 기본 세션 쿠키 이름
+                sessionIdFromCookie = cookie.getValue();
+                break;
+            }
+        }
+
+        if (sessionIdFromCookie == null || !sessionIdFromCookie.equals(httpRequest.getSession().getId())) {
+            response.put("error", "Invalid session. Please log in again.");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        // 세션에서 로그인 정보 확인
+        Object loginUser = httpRequest.getSession().getAttribute("loginUser");
+        if (loginUser == null) {
+            response.put("error", "User not logged in. Please log in first.");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
         try {
-            // 서비스 계층을 통해 조합 생성
+            // 조합 생성 로직 수행
             Association association = associationService.createAssociation(request);
-            //초기엔 조합장 null로 설정해둔뒤, 투표하고나서 결정
-            //TODO : 위도, 경도 두값도 같이 저장하게
+
+            // 추가 작업 (초기값 설정)
             association.setHeadId(null);
             association.setStatus(AssociationStatus.PENDING);
-            // 성공 시 응답 반환
-            response.put("association address", request.toString());
-            response.put("조합이 성공적으로 생성되었습니다.", association);
+
+            response.put("message", "Association created successfully.");
+            response.put("association", association);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
-            // 오류 발생 시 예외 메시지와 함께 Bad Request 반환
-            response.put("error occured while creating association", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            response.put("error", "An error occurred while creating the association.");
+            response.put("details", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @GetMapping("/check-to-join")
     public ResponseEntity<List<Association>> requestToJoin() {

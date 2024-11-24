@@ -61,13 +61,16 @@ public class UserController {
 
     //세션확인하기
     @GetMapping("/check/session")
-    public ResponseEntity<Map<String, Object>> findLogedInUser(@SessionAttribute(name="loginUser",required=false) String userId){
+    public ResponseEntity<Map<String, Object>> findLogedInUser(@SessionAttribute(name="loginUser",required=false) String userId, HttpServletRequest request){
         Map<String, Object> response = new HashMap<>();
-       // System.out.println(logedMember.getUserName());
-        if(userId == null){
+        if(userId == null){ //userId 없는경우.
+            System.out.println("noUserId");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
+
+        System.out.println(request.getSession().getAttribute("loginUser"));
         response.put("user", userId);
+        response.put("request", request.getSession().getAttribute("loginUser"));
         return ResponseEntity.ok(response);
     }
 
@@ -85,12 +88,15 @@ public class UserController {
 
         // 로그인 성공 => 세션 생성
         req.getSession().invalidate();
+        // 세션 생성하기 전에 기존의 세션을 파기
         HttpSession session = req.getSession(true);
+        System.out.println("sessioncreated : "+ req.getSession().getId());
         session.setAttribute("loginUser", user.getUserId());
         session.setMaxInactiveInterval(1800); //세션 유효 기간 : 30분 : 1800
 
         //System.out.println("sessionId : " + session.getId());
         response.put("success", "sessionLogin successed");
+        response.put("user", user.getUserId());
         return ResponseEntity.ok(response);
     }
 
