@@ -139,7 +139,7 @@ public class AssociationController {
     public ResponseEntity<List<Users>> requestList(@RequestParam int associationId) {
         try {
             List<Users> userList = userService.findByAssociation(associationId);
-
+            
 
             return ResponseEntity.ok(userList);
         } catch (EntityNotFoundException e) {

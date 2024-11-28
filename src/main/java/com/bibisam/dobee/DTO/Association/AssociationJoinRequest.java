@@ -7,8 +7,8 @@ import lombok.Setter;
 @Setter
 public class AssociationJoinRequest {
 
-    String userId;
-    int associationId;
+    private String userId;
+    private int associationId;
 
 
 }
