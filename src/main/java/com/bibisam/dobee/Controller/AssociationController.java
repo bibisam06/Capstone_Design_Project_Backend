@@ -84,6 +84,8 @@ public class AssociationController {
             association.setHeadId(null);
             association.setStatus(AssociationStatus.PENDING);
 
+            //TODO : status 값이 null로 들어가는문제
+            //TODO : 위도경도값저장하기.
             response.put("message", "Association created successfully.");
             response.put("association", association);
             return new ResponseEntity<>(response, HttpStatus.CREATED);

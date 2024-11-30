@@ -29,7 +29,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/user/**", "/api/vote/**", "/api/association/**").permitAll()
                                 .anyRequest().authenticated())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // 필요 시 세션 생성
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 필요 시 세션 생성
+                        .maximumSessions(1) //동일한 ID에 대하여 세션 갯수
                 );
 
 
