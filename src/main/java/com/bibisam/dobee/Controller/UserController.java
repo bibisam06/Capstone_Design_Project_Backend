@@ -1,3 +1,4 @@
+//UserController
 package com.bibisam.dobee.Controller;
 
 import com.bibisam.dobee.DTO.Auth.EmailRequest;
@@ -19,10 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
 
 
 @RequiredArgsConstructor
@@ -42,7 +42,7 @@ public class UserController {
     @PostMapping("/join")
     public ResponseEntity<Map<String, Object>> join(@Validated @RequestBody JoinRequest request) {
 
-       Map<String, Object> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         try{
             Users joinedUser = userService.join(request);
             response.put("message", "User successfully registered");
@@ -61,19 +61,22 @@ public class UserController {
     }
 
     //세션확인하기
-    @GetMapping("/check-session")
-    public ResponseEntity<Map<String, Object>> findLogedInUser(@SessionAttribute(name="loginUser",required=false) String userId){
+    @GetMapping("/check/session")
+    public ResponseEntity<Map<String, Object>> findLogedInUser(@SessionAttribute(name="loginUser",required=false) String userId, HttpServletRequest request){
         Map<String, Object> response = new HashMap<>();
-       // System.out.println(logedMember.getUserName());
-        if(userId == null){
-            return ResponseEntity.ok(response);
+        if(userId == null){ //userId 없는경우.
+            System.out.println("noUserId");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
+
+        System.out.println(request.getSession().getAttribute("loginUser"));
         response.put("user", userId);
+        response.put("request", request.getSession().getAttribute("loginUser"));
         return ResponseEntity.ok(response);
     }
 
     //로그인
-    @PostMapping("/session-login")
+    @PostMapping("/login")
     public ResponseEntity<Map<String ,Object>> sessionLogin(@Valid @ModelAttribute LoginRequest loginRequest, HttpServletRequest req){
         Users user = userService.login(loginRequest);
         Map<String, Object> response = new HashMap<>();
@@ -86,26 +89,33 @@ public class UserController {
 
         // 로그인 성공 => 세션 생성
         req.getSession().invalidate();
+        // 세션 생성하기 전에 기존의 세션을 파기
         HttpSession session = req.getSession(true);
+        System.out.println("sessioncreated : "+ req.getSession().getId());
         session.setAttribute("loginUser", user.getUserId());
         session.setMaxInactiveInterval(1800); //세션 유효 기간 : 30분 : 1800
 
         //System.out.println("sessionId : " + session.getId());
         response.put("success", "sessionLogin successed");
+        response.put("user", user.getUserId());
         return ResponseEntity.ok(response);
     }
 
     //로그아웃
-    @GetMapping("/session-logout")
+    @GetMapping("/logout")
     public ResponseEntity<Map<String,Object>> sessionLogout(HttpSession session) throws Exception{
-       Map<String, Object> response = new HashMap<>();
-       try{
-           response.put("success", "sessionLogout successed");
-           return ResponseEntity.ok(response);
-       }catch(Exception e){
-           response.put("error", e.getMessage());
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-       }
+        Map<String, Object> response = new HashMap<>();
+        try{
+            if(session != null) {
+                System.out.println("세션 존재함");
+                session.invalidate();
+            }
+            response.put("success", "sessionLogout successed");
+            return ResponseEntity.ok(response);
+        }catch(Exception e){
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 
     //회원탈퇴
@@ -116,7 +126,7 @@ public class UserController {
     }
 
     //아이디 찾기
-    @GetMapping("/find-id")
+    @GetMapping("/find_id")
     public ResponseEntity<Map<String, Object>> findMyId(@RequestParam String email) {
         Map<String, Object> response = new HashMap<>();
 
@@ -133,7 +143,7 @@ public class UserController {
 
 
     //비밀번호 찾기-이메일인증은 추후 추가여부 결정
-    @PostMapping("/find-pw")
+    @PostMapping("/find_pw")
     public ResponseEntity<Map<String, Object>> findMyPw(@RequestParam String userId) {
         Map<String, Object> response = new HashMap<>();
         Users userFound = userService.findByUserId(userId);
@@ -150,7 +160,7 @@ public class UserController {
     }
 
     //비밀번호 수정
-    @PostMapping("/change-pw")
+    @PostMapping("/change_pw")
     public ResponseEntity<Map<String, Object>> changePw(@RequestBody String userId, String userPw) {
         Map<String, Object> response = new HashMap<>();
         Users findUser = userService.findByUserId(userId);
@@ -167,17 +177,17 @@ public class UserController {
             return ResponseEntity.ok(response);
         }
 
-        
+
     }
 
     //이메일 보내기
-    @PostMapping("/send-email")
+    @PostMapping("/send_email")
     public ResponseEntity<ResponseDto> sendEmail(@RequestBody @Validated EmailRequest request){
         emailService.sendEmail(request);
         log.info("sendMail code : {}, message : {}", HttpStatus.OK, HttpStatus.OK.getReasonPhrase());
         ResponseDto responseDto = ResponseDto.of(HttpStatus.OK, HttpStatus.OK.getReasonPhrase());
 
-        // ResponseEntity로 반환
+
         return ResponseEntity.ok(responseDto);
     }
 

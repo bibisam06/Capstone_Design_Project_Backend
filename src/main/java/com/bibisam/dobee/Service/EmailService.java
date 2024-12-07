@@ -3,9 +3,9 @@ package com.bibisam.dobee.Service;
 import com.bibisam.dobee.DTO.Auth.EmailRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,7 +13,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Random;
 
@@ -21,6 +20,8 @@ import java.util.Random;
 @Slf4j
 @RequiredArgsConstructor
 public class EmailService {
+
+    @Autowired
     private final JavaMailSender javaMailSender;
 
     @Async

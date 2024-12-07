@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,7 +25,9 @@ public class AssociationRequest {
     @NotBlank(message = "아파트 이름이 비어있습니다.")
     private String apartmentName;
 
+    private BigDecimal longitude;
 
+    private BigDecimal latitude;
     //주소 toString
     @Override
     public String toString() {
@@ -47,7 +51,9 @@ public class AssociationRequest {
                 .city(this.city)                     // DTO의 city 필드 매핑
                 .district(this.district)             // DTO의 district 필드 매핑
                 .houseNumber(this.houseNumber)       // DTO의 houseNumber 필드 매핑
-                .apartmentName(this.apartmentName)   // DTO의 apartmentName 필드 매핑
+                .apartmentName(this.apartmentName)
+                .longitude(this.longitude)
+                .latitude(this.latitude)
                 .build();
     }
 

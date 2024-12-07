@@ -42,7 +42,7 @@ src/main/resources/application-db.properties
 keystore-64bit.txt
 src/main/resources/keystore.p12
 keystore_base64.txt
-truststore
+src/main/resources/truststore
 keystore
 sssl.cer
 dobee-web.pem

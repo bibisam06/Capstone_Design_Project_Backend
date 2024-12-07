@@ -3,6 +3,8 @@ package com.bibisam.dobee.Entity;
 import com.bibisam.dobee.Entity.Enum.AssociationStatus;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class Association {
     @Column(nullable = false)
     private String apartmentName;
 
-   //주소 저장
+    //주소 저장
     @Column(name="city", nullable = false)
     private String city;
     @Column(name="district", nullable = false)
@@ -43,10 +45,15 @@ public class Association {
     @Column(name = "head_id", nullable = true)  // 실제 외래 키 컬럼
     private Integer headId;
 
-
     @Enumerated(EnumType.STRING)
     private AssociationStatus status;
 
+
+    @Column(precision = 9, scale = 6)
+    private BigDecimal longitude;
+
+    @Column(precision = 9, scale = 6)
+    private BigDecimal latitude;
     //jpa
     @OneToMany(mappedBy = "association")
     private List<Users> users;

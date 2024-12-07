@@ -28,7 +28,6 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder encoder;
-
     @Autowired
     private AssociationRepository associationRepository;
 
@@ -41,6 +40,10 @@ public class UserService {
         }
 
         return userRepository.save(request.toEntity(encoder.encode(request.getUserPw())));
+    }
+
+    public Users updateUser(Users user) {
+        return userRepository.save(user);
     }
 
     //로그인
@@ -72,12 +75,14 @@ public class UserService {
     public boolean checkUserIdDuplicate(String userId) {
         return userRepository.existsByUserId(userId);
     }
+
     //모든유저삭제
     public void deleteallUser(){
         userRepository.deleteAll();
         //모든 유저 삭제시 초기화
         userRepository.initializeSequence();
     }
+
     //탈퇴
     public void deletebyUserId(String id) {
         userRepository.deleteByUserId(id);
@@ -110,4 +115,6 @@ public class UserService {
             throw new EntityNotFoundException("Association not found with id " + associationId);
         }
     }
+
+
 }

@@ -1,7 +1,6 @@
 package com.bibisam.dobee.DTO.Auth;
 
-import com.bibisam.dobee.Entity.Users;
-import jakarta.persistence.Enumerated;
+
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
