@@ -32,8 +32,6 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 필요 시 세션 생성
                         .maximumSessions(1) //동일한 ID에 대하여 세션 갯수
                 );
-
-
         return http.build();
     }
 }

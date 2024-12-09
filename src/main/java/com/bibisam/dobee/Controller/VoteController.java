@@ -2,7 +2,10 @@ package com.bibisam.dobee.Controller;
 
 import com.bibisam.dobee.DTO.Vote.VoteCreateResponse;
 import com.bibisam.dobee.DTO.Vote.VoteRequestDTO;
+import com.bibisam.dobee.Entity.Association;
+import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Entity.Vote;
+import com.bibisam.dobee.Exceptions.Association.InvalidAssociationException;
 import com.bibisam.dobee.Service.AssociationService;
 import com.bibisam.dobee.Service.UserService;
 import com.bibisam.dobee.Service.VoteService;
@@ -31,20 +34,23 @@ public class VoteController {
     @PostMapping("/create-vote")
     public ResponseEntity<VoteCreateResponse> createVote(@Validated @RequestBody VoteRequestDTO requestDTO,
                                                          HttpServletRequest request) {
+
         //로그인확인
         HttpSession session = request.getSession(false);
         if(session == null) {
 
-            return ResponseEntity.badRequest().body(new VoteCreateResponse("", false));
+            return ResponseEntity.badRequest().body(new VoteCreateResponse("You are not logined", false));
         }
         String loginUser = (String) session.getAttribute("loginUser");
 
-        try {
-            requestDTO.setUserId(loginUser); //로그인된 유저를 vote 저장
+        try{
+            Association findAssociation = associationService.findById(requestDTO.getAssociationId());
+            Users findUser = userService.findByUserId(loginUser);
+            requestDTO.setUsers(findUser); //로그인된 유저를 vote 저장
             Vote vote = voteService.ceateVote(requestDTO);
             return ResponseEntity.ok(new VoteCreateResponse("seccess", true));
-        }catch(Exception e) {
-            return ResponseEntity.badRequest().body(new VoteCreateResponse("failed by unkown error", false));
+        }catch(InvalidAssociationException e){
+            return ResponseEntity.badRequest().body(new VoteCreateResponse("failed by unknown issues..", false));
         }
     }
 

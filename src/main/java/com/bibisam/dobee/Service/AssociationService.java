@@ -2,6 +2,7 @@ package com.bibisam.dobee.Service;
 
 import com.bibisam.dobee.DTO.Association.AssociationRequest;
 import com.bibisam.dobee.Entity.Association;
+import com.bibisam.dobee.Exceptions.Association.InvalidAssociationException;
 import com.bibisam.dobee.Repository.AssociationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,8 @@ public class AssociationService {
         return associationRepository.findById(associationId);
     }
 
-    public Association findById(int id){
-        return associationRepository.findById(id).orElse(null);
+    public Association findById(int id) throws InvalidAssociationException {
+        return associationRepository.findById(id)
+                .orElseThrow(() -> new InvalidAssociationException("Invalid Association"));
     }
 }

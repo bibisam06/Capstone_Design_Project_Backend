@@ -1,5 +1,7 @@
 package com.bibisam.dobee.DTO.Vote;
 
+import com.bibisam.dobee.Entity.Association;
+import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Entity.Vote;
 import com.bibisam.dobee.Entity.Enum.VoteStatus;
 import com.bibisam.dobee.Entity.Enum.AssociationStatus;
@@ -23,7 +25,7 @@ import java.util.List;
 public class VoteRequestDTO {
 
 
-    private UserService userService;
+
 
     @NotBlank(message = "제목을 입력해주세요.")
     String title;
@@ -40,8 +42,9 @@ public class VoteRequestDTO {
     AssociationStatus associationstatus;
     @NotNull(message = "Vote status is required")
     VoteStatus voteStatus;
+    Association association;
     int associationId;
-    String userId;
+    Users users;
     private List<Vote_options> options;
 
 
@@ -52,7 +55,8 @@ public class VoteRequestDTO {
                 .startTime(this.startDate)             // DTO의 district 필드 매핑
                 .endTime(this.endDate)       // DTO의 houseNumber 필드 매핑
                 .options(this.options)
-                .users(userService.findByUserId(userId))
+                .association(this.association)
+                .users(this.users)
                 .build();
     }
 }
