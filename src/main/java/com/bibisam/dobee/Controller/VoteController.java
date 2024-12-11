@@ -1,6 +1,6 @@
 package com.bibisam.dobee.Controller;
 
-import com.bibisam.dobee.DTO.Vote.VoteCreateResponse;
+import com.bibisam.dobee.DTO.Auth.ResponseDto;
 import com.bibisam.dobee.DTO.Vote.VoteRequestDTO;
 import com.bibisam.dobee.Entity.Association;
 import com.bibisam.dobee.Entity.Users;
@@ -32,14 +32,14 @@ public class VoteController {
 
     // TODO : 투표 생성
     @PostMapping("/create-vote")
-    public ResponseEntity<VoteCreateResponse> createVote(@Validated @RequestBody VoteRequestDTO requestDTO,
-                                                         HttpServletRequest request) {
+    public ResponseEntity<ResponseDto> createVote(@Validated @RequestBody VoteRequestDTO requestDTO,
+                                                  HttpServletRequest request) {
 
         //로그인확인
         HttpSession session = request.getSession(false);
         if(session == null) {
 
-            return ResponseEntity.badRequest().body(new VoteCreateResponse("You are not logined", false));
+            return ResponseEntity.badRequest().body(new ResponseDto(400, "You are not logined"));
         }
         String loginUser = (String) session.getAttribute("loginUser");
 
@@ -48,15 +48,16 @@ public class VoteController {
             Users findUser = userService.findByUserId(loginUser);
             requestDTO.setUsers(findUser); //로그인된 유저를 vote 저장
             Vote vote = voteService.ceateVote(requestDTO);
-            return ResponseEntity.ok(new VoteCreateResponse("seccess", true));
+            return ResponseEntity.ok(new ResponseDto(500, "Vote created successfully"));
         }catch(InvalidAssociationException e){
-            return ResponseEntity.badRequest().body(new VoteCreateResponse("failed by unknown issues..", false));
+            return ResponseEntity.badRequest()
+                    .body(new ResponseDto(700, "Threre is not a valid association with" + requestDTO.getAssociationId()));
         }
     }
 
     //TODO : 투표하기
     @GetMapping("/voting")
-    public void voting(){
+    public void voting( HttpServletRequest request){
 
 
     }

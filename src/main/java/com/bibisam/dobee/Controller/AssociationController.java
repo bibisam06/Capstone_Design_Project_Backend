@@ -2,18 +2,20 @@ package com.bibisam.dobee.Controller;
 
 import com.bibisam.dobee.DTO.Association.AssociationJoinRequest;
 import com.bibisam.dobee.DTO.Association.AssociationRequest;
+import com.bibisam.dobee.DTO.Auth.ResponseDto;
 import com.bibisam.dobee.Entity.Association;
 import com.bibisam.dobee.Entity.Enum.AssociationStatus;
 import com.bibisam.dobee.Entity.Enum.UserStatus;
 import com.bibisam.dobee.Entity.Users;
+import com.bibisam.dobee.Exceptions.Association.InvalidAssociationException;
 import com.bibisam.dobee.Service.AssociationService;
 import com.bibisam.dobee.Service.AuthService;
 import com.bibisam.dobee.Service.UserService;
 import com.bibisam.dobee.Service.VoteService;
 import jakarta.persistence.EntityNotFoundException;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,37 +46,16 @@ public class AssociationController {
 
 
     @PostMapping("/new/association")
-    public ResponseEntity<Map<String, Object>> newAssociation(
+    public ResponseEntity<ResponseDto> newAssociation(
             @Validated @RequestBody AssociationRequest request,
             HttpServletRequest httpRequest) {
-        Map<String, Object> response = new HashMap<>();
-
-        // 쿠키 받아오기
-        Cookie[] cookies = httpRequest.getCookies();
-        if (cookies == null || cookies.length == 0) {
-            response.put("error", "No cookies found. Please log in first.");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        // 로그인 여부 확인
+        HttpSession session = httpRequest.getSession(false);
+        if (session == null) {
+            return ResponseEntity.badRequest().body(new ResponseDto(400, "You are not logged in"));
         }
 
-        String sessionIdFromCookie = null;
-        for (Cookie cookie : cookies) {
-            if ("JSESSIONID".equals(cookie.getName())) { // JSESSIONID는 기본 세션 쿠키 이름
-                sessionIdFromCookie = cookie.getValue();
-                break;
-            }
-        }
-
-        if (sessionIdFromCookie == null || !sessionIdFromCookie.equals(httpRequest.getSession().getId())) {
-            response.put("error", "Invalid session. Please log in again.");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
-
-        // 세션에서 로그인 정보 확인
-        Object loginUser = httpRequest.getSession().getAttribute("loginUser");
-        if (loginUser == null) {
-            response.put("error", "User not logged in. Please log in first.");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
+        String loginUser = (String) session.getAttribute("loginUser");
 
         try {
             // 조합 생성 로직 수행
@@ -82,17 +63,19 @@ public class AssociationController {
 
             // 추가 작업 (초기값 설정)
             association.setHeadId(null);
-            association.setStatus(AssociationStatus.PENDING);
+            association.setStatus(AssociationStatus.PENDING);  // 상태 명시적으로 설정
 
-            //TODO : status 값이 null로 들어가는문제
-            //TODO : 위도경도값저장하기.
-            response.put("message", "Association created successfully.");
-            response.put("association", association);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            // 위도/경도 값 저장 부분 (TODO로 남겨둠)
+            // 예: association.setLatitude(request.getLatitude());
+            // 예: association.setLongitude(request.getLongitude());
+
+            // Association 생성 성공
+            return ResponseEntity.status(HttpStatus.CREATED) // 201 상태 코드로 성공 응답
+                    .body(new ResponseDto(201, "Association created successfully"+ association));
         } catch (Exception e) {
-            response.put("error", "An error occurred while creating the association.");
-            response.put("details", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            // 예외 처리
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 상태 코드
+                    .body(new ResponseDto(500, e.getMessage()));
         }
     }
 
@@ -121,14 +104,18 @@ public class AssociationController {
     //조합 가입 승인 api
     @GetMapping("/approve/join")
     public ResponseEntity<String> approveToJoin(@RequestParam int associationId, String userId) {
-        Association association = associationService.findById(associationId);
-        Users user = userService.findByUserId(userId);
+        try{
+            Association association = associationService.findById(associationId);
+            Users user = userService.findByUserId(userId);
 
-        user.setUserStatus(UserStatus.AFTER_JOIN);
-        user.setAssociation(association);
-        //바뀐값 update
-        userService.updateUser(user);
-        return ResponseEntity.ok("approve to join request success ");
+            user.setUserStatus(UserStatus.AFTER_JOIN);
+            user.setAssociation(association);
+            //바뀐값 update
+            userService.updateUser(user);
+            return ResponseEntity.ok("approve to join request success ");
+        }catch(InvalidAssociationException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     //TODO:조합 가입 거절
