@@ -82,6 +82,8 @@ public class AssociationController {
     //가입가능한 조합 리스트 확인
     @GetMapping("/check-to-join")
     public ResponseEntity<List<Association>> requestToJoin() {
+
+
         List<Association> list = associationService.getAllAssociations();
         return ResponseEntity.ok(list);
     }

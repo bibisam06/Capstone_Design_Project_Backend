@@ -64,7 +64,7 @@ public class VoteController {
 
     //TODO : myVote
     @GetMapping("/myvote")
-    public void myVote(){
+    public void myVote(HttpServletRequest request){
 
     }
 

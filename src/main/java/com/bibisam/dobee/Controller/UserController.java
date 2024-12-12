@@ -185,7 +185,7 @@ public class UserController {
     public ResponseEntity<ResponseDto> sendEmail(@RequestBody @Validated EmailRequest request){
         emailService.sendEmail(request);
         log.info("sendMail code : {}, message : {}", HttpStatus.OK, HttpStatus.OK.getReasonPhrase());
-        ResponseDto responseDto = ResponseDto.of(HttpStatus.OK, HttpStatus.OK.getReasonPhrase());
+        ResponseDto responseDto = new ResponseDto(200, "send done");
 
 
         return ResponseEntity.ok(responseDto);
