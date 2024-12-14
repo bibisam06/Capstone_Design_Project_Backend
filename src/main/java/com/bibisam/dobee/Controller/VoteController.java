@@ -23,12 +23,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/vote")
 public class VoteController {
 
-    @Autowired
-    private VoteService voteService;
-    @Autowired
-    private AssociationService associationService;
-    @Autowired
-    private UserService userService;
+    private final VoteService voteService;
+
+    private final AssociationService associationService;
+
+    private final UserService userService;
 
     // TODO : 투표 생성
     @PostMapping("/create-vote")

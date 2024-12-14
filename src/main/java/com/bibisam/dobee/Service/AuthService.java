@@ -8,8 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
-    @Autowired
-    UserService userService;
+
+    private final UserService userService;
+
+    public AuthService(UserService userService) {
+        this.userService = userService;
+    }
 
     // 사용자가 조합에 가입되어 있는지 확인
     public boolean isMember(String userId) {

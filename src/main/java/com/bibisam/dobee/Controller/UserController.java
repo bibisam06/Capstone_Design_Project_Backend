@@ -31,11 +31,9 @@ import java.util.Map;
 @RequestMapping("/api/user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
     //TODO : 전역에러, 커스텀에러 등 처리 ,어노테이션
     //회원가입

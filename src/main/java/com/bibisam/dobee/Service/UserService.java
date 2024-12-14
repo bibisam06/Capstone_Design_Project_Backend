@@ -24,12 +24,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder encoder;
-    @Autowired
-    private AssociationRepository associationRepository;
+
+    private final UserRepository userRepository;
+
+    PasswordEncoder encoder;
+
+    private final AssociationRepository associationRepository;
 
 
     //회원 가입
@@ -111,7 +111,6 @@ public class UserService {
             Association association = optionalAssociation.get();  // Optional에서 실제 Association 객체를 꺼냄
             return userRepository.findByAssociationAndUserStatus(association, UserStatus.PENDING);
         } else {
-            // Association이 존재하지 않을 경우의 처리
             throw new EntityNotFoundException("Association not found with id " + associationId);
         }
     }

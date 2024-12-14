@@ -23,11 +23,7 @@ jobs:
           echo "$PEM_KEY_BASE64" | base64 --decode > dobee-web.pem
           chmod 400 dobee-web.pem
 
-#      # SSH 연결 테스트
-#      - name: SSH 연결 테스트
-#        run: |
-#          ssh -o StrictHostKeyChecking=no -i dobeeweb ubuntu@ec2-13-124-83-135.ap-northeast-2.compute.amazonaws.com echo "SSH 연결 성공"
-
+#
       # JDK 17 설정
       - name: JDK 17 설정
         uses: actions/setup-java@v4

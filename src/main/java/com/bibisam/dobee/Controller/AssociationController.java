@@ -32,18 +32,13 @@ import java.util.Map;
 @RequestMapping("/api/association")
 public class AssociationController {
 
-    @Autowired
-    private AssociationService associationService;
+    private final AssociationService associationService;
 
-    @Autowired
-    VoteService voteService;
+    private final VoteService voteService;
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
 
-    @Autowired
-    private UserService userService;
-
+    private final UserService userService;
 
     @PostMapping("/new/association")
     public ResponseEntity<ResponseDto> newAssociation(

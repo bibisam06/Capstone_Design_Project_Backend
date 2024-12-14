@@ -21,8 +21,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class EmailService {
 
-    @Autowired
-    private final JavaMailSender javaMailSender;
+    JavaMailSender javaMailSender;
 
     @Async
    public void sendEmail(EmailRequest request){

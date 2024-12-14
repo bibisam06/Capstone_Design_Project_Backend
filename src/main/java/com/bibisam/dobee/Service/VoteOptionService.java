@@ -8,8 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class VoteOptionService {
 
-    @Autowired
-    VoteOptionRepository voteOptionRepository;
+
+    private final VoteOptionRepository voteOptionRepository;
+
+    public VoteOptionService(VoteOptionRepository voteOptionRepository) {
+        this.voteOptionRepository = voteOptionRepository;
+    }
 
     public/*Vote_options*/ void createOptions(){
 

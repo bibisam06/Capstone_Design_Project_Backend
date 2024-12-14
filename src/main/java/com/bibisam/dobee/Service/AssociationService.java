@@ -16,8 +16,11 @@ import java.util.Optional;
 @Service
 public class AssociationService {
 
-    @Autowired
-    private AssociationRepository associationRepository;
+    private final AssociationRepository associationRepository;
+
+    public AssociationService(AssociationRepository associationRepository) {
+        this.associationRepository = associationRepository;
+    }
 
     //모든 조합 조회 가능.
     public List<Association> getAllAssociations() {
