@@ -10,6 +10,7 @@ import lombok.Setter;
 public class Vote_options {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  int id;
+
     private  String vote_text;
 
     @ManyToOne

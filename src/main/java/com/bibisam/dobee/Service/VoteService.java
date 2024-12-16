@@ -1,14 +1,18 @@
 package com.bibisam.dobee.Service;
 
 import com.bibisam.dobee.DTO.Vote.VoteRequestDTO;
+import com.bibisam.dobee.Entity.Association;
 import com.bibisam.dobee.Entity.Enum.VoteStatus;
 import com.bibisam.dobee.Entity.Vote;
 import com.bibisam.dobee.Entity.Vote_options;
+import com.bibisam.dobee.Exceptions.Association.InvalidAssociationException;
 import com.bibisam.dobee.Repository.VoteOptionRepository;
 import com.bibisam.dobee.Repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,21 +23,25 @@ public class VoteService {
 
     private final VoteOptionRepository voteOptionRepository;
 
+    private final AssociationService associationService;
     //투표 생성
-    public Vote ceateVote(VoteRequestDTO request) {
+    public Vote ceateVote(VoteRequestDTO request) throws InvalidAssociationException {
+        //Vote 생성
+        //TODO : association관련정보 null로들어가는거 수정해야함..
+        Association votedAssociation = associationService.findById(request.getAssociationId());
+        request.setAssociation(votedAssociation);
+        Vote prevote = new Vote();
+        prevote = request.toEntity();
 
-        if(request.getVoteStatus() == VoteStatus.PRE_CREATION){
-            request.setVoteStatus(VoteStatus.PRE_CREATION);
-        }else{
-            request.setVoteStatus(VoteStatus.POST_CREATION);
-        }
-
-        Vote vote = voteRepository.save(request.toEntity());
+        Vote vote = voteRepository.save(prevote);
         // VoteOption 생성
+        List<Vote_options> options = request.getOptions();
+
         for (Vote_options optionText : request.getOptions()) {
             Vote_options voteOption = new Vote_options();
+            System.out.println(voteOption);
             voteOption.setVote(vote);
-            voteOptionRepository.save(voteOption); //옵션저장.
+            voteOptionRepository.save(voteOption);
         }
 
         return vote;

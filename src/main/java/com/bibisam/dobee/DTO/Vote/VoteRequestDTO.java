@@ -39,12 +39,12 @@ public class VoteRequestDTO {
     @NotNull
     @FutureOrPresent(message = "End date must be in the future or present")
     LocalDateTime endDate;
-    AssociationStatus associationstatus;
-    @NotNull(message = "Vote status is required")
-    VoteStatus voteStatus;
+
     Association association;
     int associationId;
     Users users;
+
+
     private List<Vote_options> options;
 
 
