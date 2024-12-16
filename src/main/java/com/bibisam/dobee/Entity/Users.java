@@ -3,10 +3,6 @@ package com.bibisam.dobee.Entity;
 import com.bibisam.dobee.Entity.Enum.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
-import org.antlr.v4.runtime.misc.NotNull;
-
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 

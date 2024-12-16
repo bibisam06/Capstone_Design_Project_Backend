@@ -3,7 +3,6 @@ package com.bibisam.dobee.Entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.mapping.ToOne;
 
 @Getter
 @Setter

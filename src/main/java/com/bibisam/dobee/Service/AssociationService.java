@@ -4,9 +4,7 @@ import com.bibisam.dobee.DTO.Association.AssociationRequest;
 import com.bibisam.dobee.Entity.Association;
 import com.bibisam.dobee.Exceptions.Association.InvalidAssociationException;
 import com.bibisam.dobee.Repository.AssociationRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

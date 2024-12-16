@@ -1,7 +1,5 @@
 package com.bibisam.dobee.DTO.Vote;
 
-import com.bibisam.dobee.Entity.Vote;
-import com.bibisam.dobee.Entity.Vote_options;
 import lombok.Getter;
 import lombok.Setter;
 

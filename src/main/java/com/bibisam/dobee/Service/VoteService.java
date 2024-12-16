@@ -2,14 +2,12 @@ package com.bibisam.dobee.Service;
 
 import com.bibisam.dobee.DTO.Vote.VoteRequestDTO;
 import com.bibisam.dobee.Entity.Association;
-import com.bibisam.dobee.Entity.Enum.VoteStatus;
 import com.bibisam.dobee.Entity.Vote;
 import com.bibisam.dobee.Entity.Vote_options;
 import com.bibisam.dobee.Exceptions.Association.InvalidAssociationException;
 import com.bibisam.dobee.Repository.VoteOptionRepository;
 import com.bibisam.dobee.Repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +24,7 @@ public class VoteService {
     private final AssociationService associationService;
     //투표 생성
     public Vote ceateVote(VoteRequestDTO request) throws InvalidAssociationException {
-        //TODO : 정족수 계산, 
+        //TODO : 정족수 계산,  투표 종류 ( pre , post ) 하는거 -> 그리구 상태따라서 다른로직해야함..
         List<Vote_options> options = request.getOptions();
         Association votedAssociation = associationService.findById(request.getAssociationId());
         request.setAssociation(votedAssociation);

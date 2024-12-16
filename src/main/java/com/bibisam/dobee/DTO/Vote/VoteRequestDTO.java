@@ -3,16 +3,11 @@ package com.bibisam.dobee.DTO.Vote;
 import com.bibisam.dobee.Entity.Association;
 import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Entity.Vote;
-import com.bibisam.dobee.Entity.Enum.VoteStatus;
-import com.bibisam.dobee.Entity.Enum.AssociationStatus;
 import com.bibisam.dobee.Entity.Vote_options;
-import com.bibisam.dobee.Repository.UserRepository;
-import com.bibisam.dobee.Service.UserService;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.List;

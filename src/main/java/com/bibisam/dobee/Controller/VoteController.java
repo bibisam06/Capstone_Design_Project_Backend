@@ -3,7 +3,6 @@ package com.bibisam.dobee.Controller;
 import com.bibisam.dobee.DTO.Auth.ResponseDto;
 import com.bibisam.dobee.DTO.Vote.VoteRequestDTO;
 import com.bibisam.dobee.DTO.Vote.VotingDTO;
-import com.bibisam.dobee.Entity.Association;
 import com.bibisam.dobee.Entity.User_myvote;
 import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Entity.Vote;
@@ -14,7 +13,6 @@ import com.bibisam.dobee.Service.VoteService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,10 +38,10 @@ public class VoteController {
 
 //        //로그인확인
        HttpSession session = request.getSession(false);
-//        if(session == null) {
-//
-//            return ResponseEntity.badRequest().body(new ResponseDto(400, "You are not logined"));
-//        }
+        if(session == null) {
+
+            return ResponseEntity.badRequest().body(new ResponseDto(400, "You are not logined"));
+        }
         String loginUser = (String) session.getAttribute("loginUser");
 
         try{
