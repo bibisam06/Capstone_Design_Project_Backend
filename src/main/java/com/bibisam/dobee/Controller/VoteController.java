@@ -47,7 +47,6 @@ public class VoteController {
         String loginUser = (String) session.getAttribute("loginUser");
 
         try{
-            Association findAssociation = associationService.findById(requestDTO.getAssociationId());
             Users findUser = userService.findByUserId(loginUser);
             requestDTO.setUsers(findUser); //로그인된 유저를 vote 저장
             Vote vote = voteService.ceateVote(requestDTO);

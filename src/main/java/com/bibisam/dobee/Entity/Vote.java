@@ -37,7 +37,7 @@ public class Vote {
     @JoinColumn(name="created_by")
     private Users users;
 
-    @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "vote")
     private List<Vote_options> options;
 
     @OneToMany(mappedBy = "vote")

@@ -26,21 +26,24 @@ public class VoteService {
     private final AssociationService associationService;
     //투표 생성
     public Vote ceateVote(VoteRequestDTO request) throws InvalidAssociationException {
-        //Vote 생성
-        //TODO : association관련정보 null로들어가는거 수정해야함..
+        //TODO : 정족수 계산, 
+        List<Vote_options> options = request.getOptions();
         Association votedAssociation = associationService.findById(request.getAssociationId());
         request.setAssociation(votedAssociation);
         Vote prevote = new Vote();
         prevote = request.toEntity();
-
+        prevote.setTotalAgenda(options.size());
         Vote vote = voteRepository.save(prevote);
         // VoteOption 생성
-        List<Vote_options> options = request.getOptions();
 
         for (Vote_options optionText : request.getOptions()) {
+            System.out.println("for문에서 한번저장했다..");
             Vote_options voteOption = new Vote_options();
-            System.out.println(voteOption);
+            // vote_text 설정
+            voteOption.setVote_text(optionText.getVote_text());
+            // 연관관계 설정
             voteOption.setVote(vote);
+            // 저장
             voteOptionRepository.save(voteOption);
         }
 
