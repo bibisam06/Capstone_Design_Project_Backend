@@ -11,8 +11,8 @@ import java.util.List;
 @Setter
 public class VotingDTO {
 
-    private int id; //
-    private int association_id; //조합 아이디.
-    private Vote_options voted_option;
+    private int association_id;
+    private int vote_option_id;
+    private int vote_id;
 
 }

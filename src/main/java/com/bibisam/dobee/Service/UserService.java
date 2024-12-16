@@ -27,7 +27,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    PasswordEncoder encoder;
+    private final PasswordEncoder encoder;
 
     private final AssociationRepository associationRepository;
 

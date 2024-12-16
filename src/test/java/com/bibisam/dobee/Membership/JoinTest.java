@@ -7,15 +7,24 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-//회원가입-회원탈퇴
+//회원 기능 관련 테스트
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 class JoinTest {
+
+    JoinTest(UserService userService, PasswordEncoder encoder, EntityManager entityManager) {
+        this.userService = userService;
+        this.encoder = encoder;
+        this.entityManager = entityManager;
+    }
 
     @AfterEach
     @Rollback  // 트랜잭션 롤백
@@ -25,12 +34,10 @@ class JoinTest {
     }
 
 
-    @Autowired
-    UserService userService;
-    @Autowired
-    PasswordEncoder encoder;
-    @Autowired
-    private EntityManager entityManager;
+
+    private final UserService userService;
+    private final PasswordEncoder encoder;
+    private final EntityManager entityManager;
     @Test
     public void join_test() {
         //회원 가입 기능 테스트
