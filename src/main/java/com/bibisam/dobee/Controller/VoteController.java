@@ -2,11 +2,11 @@ package com.bibisam.dobee.Controller;
 
 import com.bibisam.dobee.DTO.Auth.ResponseDto;
 import com.bibisam.dobee.DTO.Vote.VoteRequestDTO;
-import com.bibisam.dobee.DTO.Vote.VotingDTO;
 import com.bibisam.dobee.Entity.User_myvote;
 import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Entity.Vote;
 import com.bibisam.dobee.Exceptions.Association.InvalidAssociationException;
+import com.bibisam.dobee.Exceptions.Vote.VoteNotFoundException;
 import com.bibisam.dobee.Service.AssociationService;
 import com.bibisam.dobee.Service.UserService;
 import com.bibisam.dobee.Service.VoteService;
@@ -35,8 +35,6 @@ public class VoteController {
     @PostMapping("/create-vote")
     public ResponseEntity<ResponseDto> createVote(@Validated @RequestBody VoteRequestDTO requestDTO,
                                                   HttpServletRequest request) {
-
-//        //로그인확인
        HttpSession session = request.getSession(false);
         if(session == null) {
 
@@ -46,20 +44,34 @@ public class VoteController {
 
         try{
             Users findUser = userService.findByUserId(loginUser);
-            requestDTO.setUsers(findUser); //로그인된 유저를 vote 저장
+            requestDTO.setUsers(findUser);
             Vote vote = voteService.ceateVote(requestDTO);
-            return ResponseEntity.ok(new ResponseDto(500, "Vote created successfully"));
+            return ResponseEntity.ok(new ResponseDto(200, "Vote created successfully"+ vote.getId() + "EndDate is " + vote.getEndTime()));
         }catch(InvalidAssociationException e){
             return ResponseEntity.badRequest()
                     .body(new ResponseDto(700, "Threre is not a valid association with" + requestDTO.getAssociationId()));
         }
     }
+//투표 참여
+//
+//사용자가 투표에 참여하면 투표에 참여 인원(voters) 목록을 추가.
+//투표는 종료일(endDate) 이전에만 가능.
 
-    //TODO : 투표하기
-    @GetMapping("/voting")
-    public void voting(HttpServletRequest request, @RequestBody VotingDTO votingDTO){
+    @PostMapping("/voting/{voteId}")
+    public ResponseEntity<ResponseDto> participateVote(@PathVariable Integer voteId, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.badRequest().body(new ResponseDto(402, "You are not logged in"));
+        }
+        String loginUser = (String) session.getAttribute("loginUser");
 
-
+        try {
+            Users findUser = userService.findByUserId(loginUser);
+            voteService.participateVote(voteId, findUser);
+            return ResponseEntity.ok(new ResponseDto(200, "Vote participation successful"));
+        } catch (VoteNotFoundException e) {
+            return ResponseEntity.badRequest().body(new ResponseDto(404, "Vote not found"));
+        }
     }
 
     //TODO : myVote
@@ -68,13 +80,12 @@ public class VoteController {
 
         //1 . 로그인 된 유저를 가져 와서 -> TODO : 없다면 에러 처리 하기..
         HttpSession session = request.getSession(false);
-//        if(session == null) {
-//
-//            return ResponseEntity.badRequest().body(new ResponseDto(400, "You are not logined"));
-//        }
+        if(session == null) {
+
+            return ResponseEntity.badRequest().body(null);
+        }
         String loginUser = (String) session.getAttribute("loginUser");
         Users findUser = userService.findByUserId(loginUser);
-
 
         List<User_myvote> myVoteList = findUser.getVoteList();
         return ResponseEntity.ok(myVoteList);

@@ -46,9 +46,9 @@ public class VoteRequestDTO {
     public Vote toEntity() {
         return Vote.builder()
                 .title(this.title)
-                .agenda(this.agenda)                     // DTO의 city 필드 매핑
-                .startTime(this.startDate)             // DTO의 district 필드 매핑
-                .endTime(this.endDate)       // DTO의 houseNumber 필드 매핑
+                .agenda(this.agenda)
+                .startTime(this.startDate)
+                .endTime(this.endDate)
                 .options(this.options)
                 .association(this.association)
                 .users(this.users)

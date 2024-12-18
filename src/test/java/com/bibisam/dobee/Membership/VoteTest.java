@@ -1,7 +1,10 @@
 package com.bibisam.dobee.Membership;
 
-import com.bibisam.dobee.Controller.VoteController;
+
+import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Entity.Vote;
+import com.bibisam.dobee.Service.UserService;
+import com.bibisam.dobee.Service.VoteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
@@ -9,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,6 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,8 +36,14 @@ public class VoteTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private VoteService voteService;
+
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
+
+    @MockBean
+    private UserService userService;
 
 
 
@@ -64,4 +74,5 @@ public class VoteTest {
                 assertEquals("success", response.get("message"));
 
     }
+    
 }
