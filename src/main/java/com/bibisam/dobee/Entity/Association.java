@@ -46,7 +46,7 @@ public class Association {
     private Integer headId;
 
     @Enumerated(EnumType.STRING)
-    private AssociationStatus status;
+    private AssociationStatus status = AssociationStatus.PENDING; //초기화
 
 
     @Column(precision = 9, scale = 6)

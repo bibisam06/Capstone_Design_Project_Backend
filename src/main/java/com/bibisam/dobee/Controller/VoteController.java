@@ -52,10 +52,6 @@ public class VoteController {
                     .body(new ResponseDto(700, "Threre is not a valid association with" + requestDTO.getAssociationId()));
         }
     }
-//투표 참여
-//
-//사용자가 투표에 참여하면 투표에 참여 인원(voters) 목록을 추가.
-//투표는 종료일(endDate) 이전에만 가능.
 
     @PostMapping("/voting/{voteId}")
     public ResponseEntity<ResponseDto> participateVote(@PathVariable Integer voteId, HttpServletRequest request) {

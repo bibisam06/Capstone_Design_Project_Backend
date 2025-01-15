@@ -22,8 +22,6 @@ class JoinTest {
 
     JoinTest(UserService userService, PasswordEncoder encoder, EntityManager entityManager) {
         this.userService = userService;
-        this.encoder = encoder;
-        this.entityManager = entityManager;
     }
 
     @AfterEach
@@ -36,8 +34,7 @@ class JoinTest {
 
 
     private final UserService userService;
-    private final PasswordEncoder encoder;
-    private final EntityManager entityManager;
+
     @Test
     public void join_test() {
         //회원 가입 기능 테스트

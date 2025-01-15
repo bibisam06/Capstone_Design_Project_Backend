@@ -14,12 +14,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Service
+@Validated
 @RequiredArgsConstructor
 public class UserService {
 
@@ -41,27 +43,21 @@ public class UserService {
         return userRepository.save(request.toEntity(encoder.encode(request.getUserPw())));
     }
 
-    public Users updateUser(Users user) {
-        return userRepository.save(user);
+    public void updateUser(Users user) {
+        userRepository.save(user);
     }
 
-    //로그인
+    //login
     public Users login(LoginRequest req) {
         Optional<Users> optionalUser = userRepository.findByUserId(req.getUserId());
-        System.out.println("reqId : " + req.getUserId() + " reqPw : " + req.getUserPw());
-        System.out.println("OptionalUser : " + optionalUser.isPresent());
-        // loginId와 일치하는 User가 없으면 null return
-        if(optionalUser.isEmpty()) {
-            return null;
+        if (optionalUser.isEmpty()) {
+            throw new IllegalArgumentException("Invalid username or password");
         }
-
         Users user = optionalUser.get();
-        System.out.println("reqId : " + user.getUserId() + "reqPw : " + user.getUserPw());
-        // 찾아온 User의 password와 입력된 password가 다르면 null return
-        if(encoder.matches(req.getUserPw(), user.getUserPw())) {
-            return user;
+        if (!encoder.matches(req.getUserPw(), user.getUserPw())) {
+            throw new IllegalArgumentException("Invalid username or password");
         }
-        return null;
+        return user;
     }
 
 

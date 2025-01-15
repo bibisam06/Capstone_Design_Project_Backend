@@ -26,6 +26,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
+@Validated
 @Slf4j
 @RequestMapping("/api/user")
 public class UserController {
@@ -34,10 +35,9 @@ public class UserController {
 
     private final EmailService emailService;
 
-    //TODO : 전역에러, 커스텀에러 등 처리 ,어노테이션
     //회원가입
     @PostMapping("/join")
-    public ResponseEntity<Map<String, Object>> join(@Validated @RequestBody JoinRequest request) {
+    public ResponseEntity<Map<String, Object>> join(@Valid @RequestBody JoinRequest request) {
 
         Map<String, Object> response = new HashMap<>();
         try{
@@ -72,32 +72,22 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    //로그인
     @PostMapping("/login")
-    public ResponseEntity<Map<String ,Object>> sessionLogin(@Valid @ModelAttribute LoginRequest loginRequest, HttpServletRequest req){
-        Users user = userService.login(loginRequest);
-        Map<String, Object> response = new HashMap<>();
-        //아이디, 비밀번호 확인하여 결괏값 반환(에러메시지)
-        if(user == null){
-            response.put("error", "Invalid username or password");
+    public ResponseEntity<ResponseDto> sessionLogin(
+            @Valid @ModelAttribute LoginRequest loginRequest, HttpServletRequest req) {
+        try {
+            Users user = userService.login(loginRequest);
+            req.getSession().invalidate();
+            HttpSession session = req.getSession(true);
+            session.setAttribute("loginUser", user.getUserId());
+            session.setMaxInactiveInterval(1800);
+
+            return ResponseEntity.ok(new ResponseDto(200, "Login succeeded"+user.getUserId()));
+        } catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(response);
+                    .body(new ResponseDto(400, ex.getMessage()));
         }
-
-        // 로그인 성공 => 세션 생성
-        req.getSession().invalidate();
-        // 세션 생성하기 전에 기존의 세션을 파기
-        HttpSession session = req.getSession(true);
-        System.out.println("sessioncreated : "+ req.getSession().getId());
-        session.setAttribute("loginUser", user.getUserId());
-        session.setMaxInactiveInterval(1800); //세션 유효 기간 : 30분 : 1800
-
-        //System.out.println("sessionId : " + session.getId());
-        response.put("success", "sessionLogin successed");
-        response.put("user", user.getUserId());
-        return ResponseEntity.ok(response);
     }
-
     //로그아웃
     @GetMapping("/logout")
     public ResponseEntity<Map<String,Object>> sessionLogout(HttpSession session) throws Exception{
@@ -179,7 +169,7 @@ public class UserController {
 
     //이메일 보내기
     @PostMapping("/send_email")
-    public ResponseEntity<ResponseDto> sendEmail(@RequestBody @Validated EmailRequest request){
+    public ResponseEntity<ResponseDto> sendEmail(@RequestBody @Valid EmailRequest request){
         emailService.sendEmail(request);
         log.info("sendMail code : {}, message : {}", HttpStatus.OK, HttpStatus.OK.getReasonPhrase());
         ResponseDto responseDto = new ResponseDto(200, "send done");

@@ -34,7 +34,7 @@ public class VoteTest {
 
 
     @Autowired
-    private MockMvc mockMvc;
+     MockMvc mockMvc;
 
     @MockBean
     private VoteService voteService;
