@@ -1,7 +1,6 @@
 //UserController
 package com.bibisam.dobee.Controller;
 
-import com.bibisam.dobee.DTO.Auth.EmailRequest;
 import com.bibisam.dobee.DTO.Auth.ResponseDto;
 import com.bibisam.dobee.DTO.User.JoinRequest;
 import com.bibisam.dobee.DTO.User.LoginRequest;
@@ -36,7 +35,6 @@ public class UserController {
 
     private final EmailService emailService;
 
-    private final RedisRepository repository;
     private final RedisRepository redisRepository;
 
     //회원가입
@@ -177,7 +175,7 @@ public class UserController {
             String verificationCode = emailService.createCode();
 
             //redisTemplate.opsForValue().set(email, verificationCode, 5, TimeUnit.MINUTES);
-            AuthenticationToken newToken = new AuthenticationToken("string", verificationCode, 300L);
+            AuthenticationToken newToken = new AuthenticationToken(email, verificationCode, 300L);
             redisRepository.save(newToken);
             // Create the email content
             String htmlContent = """
@@ -204,6 +202,18 @@ public class UserController {
         } catch (Exception e) {
             return "Failed to send verification email.";
         }
+    }
+
+    @GetMapping("/check-verification")
+    public String checkVeri(@RequestParam String verificationCode, @RequestParam String email){
+
+        final boolean isValid = userService.validateToken(email, verificationCode);
+        if(isValid){
+            return "success";
+        }else{
+            return "유효하지 않거나 만료된 인증코드입니다.";
+        }
+
     }
 
 }

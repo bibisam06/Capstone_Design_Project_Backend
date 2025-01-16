@@ -3,10 +3,12 @@ package com.bibisam.dobee.Service;
 import com.bibisam.dobee.DTO.User.JoinRequest;
 import com.bibisam.dobee.DTO.User.LoginRequest;
 import com.bibisam.dobee.Entity.Association;
+import com.bibisam.dobee.Entity.AuthenticationToken;
 import com.bibisam.dobee.Entity.Enum.UserStatus;
 import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Exceptions.User.DuplicateUserIdException;
 import com.bibisam.dobee.Repository.AssociationRepository;
+import com.bibisam.dobee.Repository.RedisRepository;
 import com.bibisam.dobee.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -32,7 +34,7 @@ public class UserService {
 
     private final AssociationRepository associationRepository;
 
-
+    private final RedisRepository redisRepository;
     //회원 가입
     @Transactional
     public Users join(JoinRequest request) {
@@ -47,7 +49,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    //login
+    @Transactional
     public Users login(LoginRequest req) {
         Optional<Users> optionalUser = userRepository.findByUserId(req.getUserId());
         if (optionalUser.isEmpty()) {
@@ -74,7 +76,6 @@ public class UserService {
     //모든유저삭제
     public void deleteallUser(){
         userRepository.deleteAll();
-        //모든 유저 삭제시 초기화
         userRepository.initializeSequence();
     }
 
@@ -90,8 +91,6 @@ public class UserService {
 
     public Users findUserByEmail(String email) {
         Optional<Users> usersOptional= userRepository.findByEmail(email);
-        System.out.println("email = " + email);
-        System.out.println("유저존재여부 = " + usersOptional.isPresent());
         return usersOptional.orElse(null);
     }
 
@@ -110,5 +109,12 @@ public class UserService {
         }
     }
 
-
+    public boolean validateToken(String uid, String inputCode) {
+        AuthenticationToken token = redisRepository.findById(uid).orElse(null);
+        System.out.println("token확인용printf");
+        if (token == null) {
+            return false;
+        }
+        return token.getTokenValue().equals(inputCode);
+    }
 }
