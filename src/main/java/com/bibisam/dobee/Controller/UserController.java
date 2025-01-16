@@ -5,8 +5,10 @@ import com.bibisam.dobee.DTO.Auth.EmailRequest;
 import com.bibisam.dobee.DTO.Auth.ResponseDto;
 import com.bibisam.dobee.DTO.User.JoinRequest;
 import com.bibisam.dobee.DTO.User.LoginRequest;
+import com.bibisam.dobee.Entity.AuthenticationToken;
 import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Exceptions.User.DuplicateUserIdException;
+import com.bibisam.dobee.Repository.RedisRepository;
 import com.bibisam.dobee.Service.EmailService;
 import com.bibisam.dobee.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
 @RequiredArgsConstructor
 @RestController
 @Validated
@@ -34,6 +35,9 @@ public class UserController {
     private final UserService userService;
 
     private final EmailService emailService;
+
+    private final RedisRepository repository;
+    private final RedisRepository redisRepository;
 
     //회원가입
     @PostMapping("/join")
@@ -72,6 +76,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    //로그인
     @PostMapping("/login")
     public ResponseEntity<ResponseDto> sessionLogin(
             @Valid @ModelAttribute LoginRequest loginRequest, HttpServletRequest req) {
@@ -129,7 +134,6 @@ public class UserController {
     }
 
 
-    //비밀번호 찾기-이메일인증은 추후 추가여부 결정
     @PostMapping("/find_pw")
     public ResponseEntity<Map<String, Object>> findMyPw(@RequestParam String userId) {
         Map<String, Object> response = new HashMap<>();
@@ -167,17 +171,39 @@ public class UserController {
 
     }
 
-    //이메일 보내기
-    @PostMapping("/send_email")
-    public ResponseEntity<ResponseDto> sendEmail(@RequestBody @Valid EmailRequest request){
-        
-        emailService.sendEmail(request);
-        log.info("sendMail code : {}, message : {}", HttpStatus.OK, HttpStatus.OK.getReasonPhrase());
-        ResponseDto responseDto = new ResponseDto(200, "send done");
+    @PostMapping("/send-verification")
+    public String sendVerificationEmail(@RequestParam String email) {
+        try {
+            String verificationCode = emailService.createCode();
 
+            //redisTemplate.opsForValue().set(email, verificationCode, 5, TimeUnit.MINUTES);
+            AuthenticationToken newToken = new AuthenticationToken("string", verificationCode, 300L);
+            redisRepository.save(newToken);
+            // Create the email content
+            String htmlContent = """
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Email Verification</title>
+                    </head>
+                    <body>
+                        <h1>Email Verification</h1>
+                        <p>Your verification code is:</p>
+                        <h2 style="color: blue;">%s</h2>
+                        <p>Please enter this code in the application to verify your email address.</p>
+                    </body>
+                    </html>
+                    """.formatted(verificationCode);
 
-        return ResponseEntity.ok(responseDto);
+            // Send the email
+            emailService.sendHtmlEmail(email, "Email Verification", htmlContent);
+
+            return "Verification email sent successfully!";
+        } catch (Exception e) {
+            return "Failed to send verification email.";
+        }
     }
-
 
 }

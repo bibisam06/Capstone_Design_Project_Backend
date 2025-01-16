@@ -9,15 +9,15 @@ import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
 @AllArgsConstructor
-@RedisHash(value="AuthToken")
+@RedisHash(value="AuthToken", timeToLive = 300) //5분
 public class AuthenticationToken {
 
     @Id
     private String uid;
 
     @Indexed
-    private Integer tokenValue; //인증용 랜덤코드
+    private String tokenValue;
 
     @TimeToLive
-    private Long expiration = 10L; //만료
+    private Long expiration;
 }

@@ -22,7 +22,6 @@ public interface UserRepository extends JpaRepository<Users, Integer> {
     Optional<Users> findByEmail(String eamil);
     Optional<Users> findByUserName(String userName);
     List<Users> findByAssociationAndUserStatus(Association association, UserStatus userStatus);
-   //시퀸스관련한 메서
     @Modifying
     @Transactional
     @Query(value = "ALTER SEQUENCE MEMBER_SEQ RESTART WITH 1", nativeQuery = true)
