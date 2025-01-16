@@ -5,6 +5,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -18,8 +19,9 @@ import java.util.Random;
 @Slf4j
 @RequiredArgsConstructor
 public class EmailService {
+    private final JavaMailSender javaMailSender;
 
-    JavaMailSender javaMailSender;
+   // private final RedisUtils redisUtils;
 
     @Async
    public void sendEmail(EmailRequest request){

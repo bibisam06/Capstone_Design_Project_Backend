@@ -170,6 +170,7 @@ public class UserController {
     //이메일 보내기
     @PostMapping("/send_email")
     public ResponseEntity<ResponseDto> sendEmail(@RequestBody @Valid EmailRequest request){
+        
         emailService.sendEmail(request);
         log.info("sendMail code : {}, message : {}", HttpStatus.OK, HttpStatus.OK.getReasonPhrase());
         ResponseDto responseDto = new ResponseDto(200, "send done");

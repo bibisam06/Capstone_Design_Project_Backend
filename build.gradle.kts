@@ -27,7 +27,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation ("org.postgresql:postgresql:42.2.19")
+	implementation ("org.postgresql:postgresql:42.7.2")
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
@@ -37,6 +37,10 @@ dependencies {
 	implementation ("jakarta.validation:jakarta.validation-api:3.0.2")
 	implementation ("org.hibernate.validator:hibernate-validator:7.0.0.Final")
 	implementation ("org.springframework.boot:spring-boot-starter-mail:3.1.2")
+	implementation ("org.springframework.boot:spring-boot-starter-data-redis")
+	// https://mvnrepository.com/artifact/io.lettuce/lettuce-core
+	implementation("io.lettuce:lettuce-core:6.5.2.RELEASE")
+
 
 }
 
