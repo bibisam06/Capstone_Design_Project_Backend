@@ -2,7 +2,6 @@ package com.bibisam.dobee.Controller;
 
 import com.bibisam.dobee.DTO.Auth.ResponseDto;
 import com.bibisam.dobee.DTO.Vote.VoteRequestDTO;
-import com.bibisam.dobee.Entity.User_myvote;
 import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Entity.Vote;
 import com.bibisam.dobee.Exceptions.Association.InvalidAssociationException;
@@ -16,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController
@@ -70,21 +67,21 @@ public class VoteController {
         }
     }
 
-    //TODO : myVote
-    @GetMapping("/myvote")
-    public ResponseEntity<List<User_myvote>> myVote(HttpServletRequest request){
-
-        //1 . 로그인 된 유저를 가져 와서 -> TODO : 없다면 에러 처리 하기..
-        HttpSession session = request.getSession(false);
-        if(session == null) {
-
-            return ResponseEntity.badRequest().body(null);
-        }
-        String loginUser = (String) session.getAttribute("loginUser");
-        Users findUser = userService.findByUserId(loginUser);
-
-        List<User_myvote> myVoteList = findUser.getVoteList();
-        return ResponseEntity.ok(myVoteList);
-    }
+//    //TODO : myVote
+//    @GetMapping("/myvote")
+//    public ResponseEntity<List<V>> myVote(HttpServletRequest request){
+//
+//        //1 . 로그인 된 유저를 가져 와서 -> TODO : 없다면 에러 처리 하기..
+//        HttpSession session = request.getSession(false);
+//        if(session == null) {
+//
+//            return ResponseEntity.badRequest().body(null);
+//        }
+//        String loginUser = (String) session.getAttribute("loginUser");
+//        Users findUser = userService.findByUserId(loginUser);
+//
+//        List<User_myvote> myVoteList = findUser.getVoteList();
+//        return ResponseEntity.ok(myVoteList);
+//    }
 
 }

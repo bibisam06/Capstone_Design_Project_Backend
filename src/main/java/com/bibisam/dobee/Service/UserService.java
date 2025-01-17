@@ -49,6 +49,9 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public Users save(Users users){
+        return userRepository.save(users);
+    }
     @Transactional
     public Users login(LoginRequest req) {
         Optional<Users> optionalUser = userRepository.findByUserId(req.getUserId());
