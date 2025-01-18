@@ -5,6 +5,7 @@ import com.bibisam.dobee.DTO.Auth.ResponseDto;
 import com.bibisam.dobee.DTO.User.FindEmailRequest;
 import com.bibisam.dobee.DTO.User.JoinRequest;
 import com.bibisam.dobee.DTO.User.LoginRequest;
+import com.bibisam.dobee.DTO.User.MyPageResponse;
 import com.bibisam.dobee.Entity.AuthenticationToken;
 import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Exceptions.User.DuplicateUserIdException;
@@ -117,7 +118,7 @@ public class UserController {
         }
     }
 
-    //회원탈퇴
+    //회원탈퇴 TODO : 반환값 주기
     @Transactional
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable String  id){
@@ -140,24 +141,22 @@ public class UserController {
         }
     }
 
+    //비밀번호 찾기 - 임시 비밀번호 발급
     @PatchMapping("/find_pw")
     public ResponseEntity<Map<String, Object>> resetPassword(@RequestBody FindEmailRequest request) {
         Map<String, Object> response = new HashMap<>();
 
-        // 유저 조회
         Users userFound = userService.findByUserId(request.getUserId());
         if (userFound == null) {
             response.put("error", "해당 아이디로 등록된 계정이 없습니다.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        // 임시 비밀번호 생성 및 저장
         String temporaryPassword = emailService.createCode(8);
-
         String hashedPassword = encoder.encode(temporaryPassword);
+        userFound.setUserPw(hashedPassword);
         userService.save(userFound);
 
-        // 응답 생성
         response.put("message", "새로운 임시 비밀번호가 생성되었습니다.");
         response.put("temporaryPassword", temporaryPassword);
         return ResponseEntity.ok(response);
@@ -185,16 +184,27 @@ public class UserController {
 
     }
 
-    //TODO : 정보바꾸기
-    @PatchMapping("/change-id/{id}")
+    //TODO : 정보바꾸기 - 마이페이지 일단 나오고 나서 할듯 ..
+    @PatchMapping("/change-detail")
     public void changeId(){
 
     }
 
     //TODO : 마이페이지정보..갖다주기
-    @GetMapping("/mypage/{id}")
-    public void myPage(){
-
+    @GetMapping("/mypage")
+    public ResponseEntity<MyPageResponse> myPage(@RequestParam String userId){
+        Users foundUser = userService.findByUserId(userId); //user찾아가지고..
+        MyPageResponse response = new MyPageResponse();
+        response.setUserName(foundUser.getUserName());
+        response.setRole(foundUser.getRole());
+        response.setUserId(foundUser.getUserId());
+        response.setEmail(foundUser.getEmail());
+        response.setUserStatus(foundUser.getUserStatus());
+        response.setPhoneNumber(foundUser.getPhoneNumber());
+        response.setMyVoteList(foundUser.getUsersList());
+        response.setAssociation(foundUser.getAssociation());
+        //TODO  : 조합관련을 어캐 넘겨줄지? 이거 inner클래스 만들어서 할까 ?
+        return ResponseEntity.ok(response);
     }
 
     //인증코드 전송

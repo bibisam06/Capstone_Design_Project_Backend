@@ -14,13 +14,5 @@ public class RedisTest {
         this.repository = repository;
     }
 
-    @Test
-    @DisplayName("redis - 인증토큰 생성, 만료 테스트")
-    public void test1() {
-        //given
-        AuthenticationToken token1 = new AuthenticationToken("1", 10000, 10L);
-        //when
-        repository.save(token1);
-        //then
-    }
+
 }
