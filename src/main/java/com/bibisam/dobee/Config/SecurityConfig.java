@@ -23,7 +23,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, CustomExceptionHandler customExceptionHandler) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrfConfigurer -> csrfConfigurer.disable()) // CSRF 보호 비활성화
                 .authorizeHttpRequests(authorizeRequests ->
@@ -31,11 +31,11 @@ public class SecurityConfig {
                                 .requestMatchers("/api/user/**", "/api/vote/**", "/api/association/**").permitAll()
                                 .anyRequest().authenticated()
                 )
-                .exceptionHandling(exceptionHandling ->
-                        exceptionHandling
-                                .authenticationEntryPoint((AuthenticationEntryPoint) customExceptionHandler)
-                                .accessDeniedHandler((AccessDeniedHandler) customExceptionHandler)
-                )
+//                .exceptionHandling(exceptionHandling ->
+//                        exceptionHandling
+//                                .authenticationEntryPoint((AuthenticationEntryPoint) customExceptionHandler)
+//                                .accessDeniedHandler((AccessDeniedHandler) customExceptionHandler)
+//                )
                 .sessionManagement(session ->
                         session
                                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 필요 시 세션 생성
