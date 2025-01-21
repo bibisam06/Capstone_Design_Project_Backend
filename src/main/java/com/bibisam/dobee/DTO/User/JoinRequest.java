@@ -26,13 +26,10 @@ public class JoinRequest {
     @Email(message = "유효한 이메일 주소를 입력해 주세요.")
     private String email;
 
-    private String role;
-    public JoinRequest(String userName, String userId, String userPw, String role) {
-        this.userName = userName;
-        this.userId = userId;
-        this.userPw = userPw;
-        this.role = role;
-    }
+    private String phoneNumber;
+    @Builder.Default
+    private String role = "MEMBER";
+
 
     // DTO에서 엔티티 객체로 변환
     public Users toEntity(String encodedPassword) {
@@ -41,7 +38,7 @@ public class JoinRequest {
                 .userName(this.userName)
                 .userPw(encodedPassword)
                 .email(this.email)
-                .role(this.role)
+                .phoneNumber(this.phoneNumber)
                 .build();
     }
 

@@ -55,11 +55,11 @@ public class EmailService {
     }
 
     // 인증번호 및 임시 비밀번호 생성 메서드
-    public String createCode() {
+    public String createCode(int n) {
         Random random = new Random();
         StringBuffer key = new StringBuffer();
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < n; i++) {
             int index = random.nextInt(4);
 
             switch (index) {

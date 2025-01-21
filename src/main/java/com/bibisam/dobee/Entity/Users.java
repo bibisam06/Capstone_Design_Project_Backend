@@ -2,6 +2,7 @@ package com.bibisam.dobee.Entity;
 
 import com.bibisam.dobee.Entity.Enum.UserStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,21 +32,25 @@ public class Users {
 
     @Column(name="user_id")
     private String userId;
+
     @Column(name="user_pw")
     private String userPw;
 
-    @Column(name="role")
-    private String role;
+    @Column(name="role", nullable = false)
+    @Builder.Default
+    private String role = "MEMBER"; // 회원 - 조합장 - 가입 안한 사람(3개로)
 
     private String email;
-
+    //false or true
     private Boolean isHead;
 
     @Enumerated(EnumType.STRING)
-    private UserStatus userStatus;
+    @Builder.Default
+    private UserStatus userStatus = UserStatus.BEFORE_JOIN; //Default 값 - before join
 
     @Column(name="phone_number")
     String phoneNumber;
+
     //jpa
     @OneToMany(mappedBy = "users")
     private final List<Vote> usersList = new ArrayList<Vote>();

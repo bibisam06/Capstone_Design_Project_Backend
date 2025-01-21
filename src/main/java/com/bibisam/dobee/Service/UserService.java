@@ -49,6 +49,9 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public Users save(Users users){
+        return userRepository.save(users);
+    }
     @Transactional
     public Users login(LoginRequest req) {
         Optional<Users> optionalUser = userRepository.findByUserId(req.getUserId());
@@ -111,7 +114,6 @@ public class UserService {
 
     public boolean validateToken(String uid, String inputCode) {
         AuthenticationToken token = redisRepository.findById(uid).orElse(null);
-        System.out.println("token확인용printf");
         if (token == null) {
             return false;
         }

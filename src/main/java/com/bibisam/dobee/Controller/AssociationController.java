@@ -13,12 +13,10 @@ import com.bibisam.dobee.Service.AuthService;
 import com.bibisam.dobee.Service.UserService;
 import com.bibisam.dobee.Service.VoteService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -36,17 +34,10 @@ public class AssociationController {
 
     private final UserService userService;
 
+
     @PostMapping("/new/association")
     public ResponseEntity<ResponseDto> newAssociation(
-            @Validated @RequestBody AssociationRequest request,
-            HttpServletRequest httpRequest) {
-        // 로그인 여부 확인
-        HttpSession session = httpRequest.getSession(false);
-        if (session == null) {
-            return ResponseEntity.badRequest().body(new ResponseDto(400, "You are not logged in"));
-        }
-
-        String loginUser = (String) session.getAttribute("loginUser");
+            @Valid @RequestBody AssociationRequest request) {
 
         try {
             // 조합 생성 로직 수행
@@ -69,8 +60,7 @@ public class AssociationController {
                     .body(new ResponseDto(500, e.getMessage()));
         }
     }
-
-    //가입가능한 조합 리스트 확인
+    
     @GetMapping("/check-to-join")
     public ResponseEntity<List<Association>> requestToJoin() {
 
@@ -116,6 +106,7 @@ public class AssociationController {
     public void declineToJoin(@RequestParam int associationId, String userId) {
         //todo : 테이블에서 삭제(대기명단테이블)
     }
+
     //TODO : 조합의 가입 요청 리스트 확인
     @GetMapping("/request/list")
     public ResponseEntity<List<Users>> requestList(@RequestParam int associationId) {

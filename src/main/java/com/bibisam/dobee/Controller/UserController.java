@@ -2,8 +2,10 @@
 package com.bibisam.dobee.Controller;
 
 import com.bibisam.dobee.DTO.Auth.ResponseDto;
+import com.bibisam.dobee.DTO.User.FindEmailRequest;
 import com.bibisam.dobee.DTO.User.JoinRequest;
 import com.bibisam.dobee.DTO.User.LoginRequest;
+import com.bibisam.dobee.DTO.User.MyPageResponse;
 import com.bibisam.dobee.Entity.AuthenticationToken;
 import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Exceptions.User.DuplicateUserIdException;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +39,8 @@ public class UserController {
     private final EmailService emailService;
 
     private final RedisRepository redisRepository;
+
+    private final PasswordEncoder encoder;
 
     //회원가입
     @PostMapping("/join")
@@ -91,6 +96,11 @@ public class UserController {
                     .body(new ResponseDto(400, ex.getMessage()));
         }
     }
+    //TODO : oAuth
+    @GetMapping("/oAuth")
+    public void oAuth(){
+
+    }
     //로그아웃
     @GetMapping("/logout")
     public ResponseEntity<Map<String,Object>> sessionLogout(HttpSession session) throws Exception{
@@ -108,7 +118,7 @@ public class UserController {
         }
     }
 
-    //회원탈퇴
+    //회원탈퇴 TODO : 반환값 주기
     @Transactional
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable String  id){
@@ -131,25 +141,30 @@ public class UserController {
         }
     }
 
-
-    @PostMapping("/find_pw")
-    public ResponseEntity<Map<String, Object>> findMyPw(@RequestParam String userId) {
+    //비밀번호 찾기 - 임시 비밀번호 발급
+    @PatchMapping("/find_pw")
+    public ResponseEntity<Map<String, Object>> resetPassword(@RequestBody FindEmailRequest request) {
         Map<String, Object> response = new HashMap<>();
-        Users userFound = userService.findByUserId(userId);
-        //TODO : 이메일 인증 후, 랜덤 코드(새비밀번호)생성
-        if (userFound != null) {
-            response.put("message", "비밀번호가 성공적으로 조회되었습니다.");
-            response.put("userId", userFound.getUserPw());
-            return ResponseEntity.ok(response);
-        } else {
+
+        Users userFound = userService.findByUserId(request.getUserId());
+        if (userFound == null) {
             response.put("error", "해당 아이디로 등록된 계정이 없습니다.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
+        String temporaryPassword = emailService.createCode(8);
+        String hashedPassword = encoder.encode(temporaryPassword);
+        userFound.setUserPw(hashedPassword);
+        userService.save(userFound);
+
+        response.put("message", "새로운 임시 비밀번호가 생성되었습니다.");
+        response.put("temporaryPassword", temporaryPassword);
+        return ResponseEntity.ok(response);
     }
 
+
     //비밀번호 수정
-    @PostMapping("/change_pw")
+    @PatchMapping("/change_pw")
     public ResponseEntity<Map<String, Object>> changePw(@RequestBody String userId, String userPw) {
         Map<String, Object> response = new HashMap<>();
         Users findUser = userService.findByUserId(userId);
@@ -169,15 +184,39 @@ public class UserController {
 
     }
 
+    //TODO : 정보바꾸기 - 마이페이지 일단 나오고 나서 할듯 ..
+    @PatchMapping("/change-detail")
+    public void changeId(){
+
+    }
+
+    //TODO : 마이페이지정보..갖다주기
+    @GetMapping("/mypage")
+    public ResponseEntity<MyPageResponse> myPage(@RequestParam String userId){
+        Users foundUser = userService.findByUserId(userId); //user찾아가지고..
+        MyPageResponse response = new MyPageResponse();
+        response.setUserName(foundUser.getUserName());
+        response.setRole(foundUser.getRole());
+        response.setUserId(foundUser.getUserId());
+        response.setEmail(foundUser.getEmail());
+        response.setUserStatus(foundUser.getUserStatus());
+        response.setPhoneNumber(foundUser.getPhoneNumber());
+        response.setMyVoteList(foundUser.getUsersList());
+        response.setAssociation(foundUser.getAssociation());
+        //TODO  : 조합관련을 어캐 넘겨줄지? 이거 inner클래스 만들어서 할까 ?
+        return ResponseEntity.ok(response);
+    }
+
+    //인증코드 전송
     @PostMapping("/send-verification")
     public String sendVerificationEmail(@RequestParam String email) {
         try {
-            String verificationCode = emailService.createCode();
+            String verificationCode = emailService.createCode(6);
 
             //redisTemplate.opsForValue().set(email, verificationCode, 5, TimeUnit.MINUTES);
             AuthenticationToken newToken = new AuthenticationToken(email, verificationCode, 300L);
             redisRepository.save(newToken);
-            // Create the email content
+
             String htmlContent = """
                     <!DOCTYPE html>
                     <html lang="en">
@@ -204,6 +243,7 @@ public class UserController {
         }
     }
 
+    //인증코드 확인
     @GetMapping("/check-verification")
     public String checkVeri(@RequestParam String verificationCode, @RequestParam String email){
 
