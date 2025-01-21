@@ -114,7 +114,6 @@ public class UserService {
 
     public boolean validateToken(String uid, String inputCode) {
         AuthenticationToken token = redisRepository.findById(uid).orElse(null);
-        System.out.println("token확인용printf");
         if (token == null) {
             return false;
         }

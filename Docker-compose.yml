@@ -1,0 +1,37 @@
+version: '1'
+
+services:
+  database:
+    container_name: dobee
+    image: postgres:15
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 1234
+      TZ: 'Asia/Seoul'
+    ports:
+      - "15432:5432"
+    networks:
+      - woowacourse-test-network
+
+  application:
+    container_name: main-server
+    restart: always
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "18080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/test
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "1234"
+    depends_on:
+      - database
+    networks:
+      - woowacourse-test-network
+    env_file:
+      - .env
+
+networks:
+  woowacourse-test-network:
+    driver: bridge

@@ -1,5 +1,6 @@
 package com.bibisam.dobee.Config;
 
+import com.bibisam.dobee.Config.Handler.CustomExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,7 +8,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -20,17 +23,25 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CustomExceptionHandler customExceptionHandler) throws Exception {
         http
-                .csrf(csrfConfigurer -> csrfConfigurer.disable())  // CSRF 보호 비활성화
-                .authorizeHttpRequests((authorizeRequests) ->
+                .csrf(csrfConfigurer -> csrfConfigurer.disable()) // CSRF 보호 비활성화
+                .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/user/**", "/api/vote/**", "/api/association/**").permitAll()
-                                .anyRequest().authenticated())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 필요 시 세션 생성
-                        .maximumSessions(1) //동일한 ID에 대하여 세션 갯수
+                                .anyRequest().authenticated()
+                )
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling
+                                .authenticationEntryPoint((AuthenticationEntryPoint) customExceptionHandler)
+                                .accessDeniedHandler((AccessDeniedHandler) customExceptionHandler)
+                )
+                .sessionManagement(session ->
+                        session
+                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 필요 시 세션 생성
+                                .maximumSessions(1) // 동일한 ID에 대해 세션 갯수 제한
                 );
         return http.build();
     }
+
 }

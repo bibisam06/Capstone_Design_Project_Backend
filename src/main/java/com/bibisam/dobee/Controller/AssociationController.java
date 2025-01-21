@@ -60,8 +60,7 @@ public class AssociationController {
                     .body(new ResponseDto(500, e.getMessage()));
         }
     }
-
-    //가입가능한 조합 리스트 확인 -> TODO : filter제외
+    
     @GetMapping("/check-to-join")
     public ResponseEntity<List<Association>> requestToJoin() {
 

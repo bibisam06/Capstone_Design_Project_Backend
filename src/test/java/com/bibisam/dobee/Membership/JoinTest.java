@@ -106,7 +106,7 @@ class JoinTest {
     @DisplayName("회원탈퇴 테스트")
     @Test
     public void delete_users(){
-        userService.deletebyUserId("jadie");
+        userService.deletebyUserId("jade");
     }
 
     @Test
