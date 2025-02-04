@@ -85,8 +85,24 @@ public class AssociationController {
         if(!pendingList.contains(findUser)){
             pendingList.add(findUser);
         }
+        else{
+            return ResponseEntity.badRequest().body("You have already Joined..");
+        }
         userService.updateUser(findUser);
         return ResponseEntity.ok("join request success ");
+    }
+
+    @GetMapping("/pendingUsers/{id}")
+    public ResponseEntity<List<Users>> getPendingUsers(@PathVariable int id) throws InvalidAssociationException
+    {
+        Association findAsso = associationService.findById(id);
+        List<Users> pendingList = findAsso.getPendingUsers();
+
+        if(pendingList.isEmpty()){
+            return ResponseEntity.badRequest().body(null);
+        }else{
+            return ResponseEntity.ok(pendingList);
+        }
     }
 
     // TODO : 2. 조합 가입 승인 api
