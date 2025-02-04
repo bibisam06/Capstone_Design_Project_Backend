@@ -20,6 +20,8 @@ public class AssociationService {
         this.associationRepository = associationRepository;
     }
 
+
+
     //모든 조합 조회 가능.
     public List<Association> getAllAssociations() {
         return associationRepository.findAll();

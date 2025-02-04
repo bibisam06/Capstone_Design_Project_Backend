@@ -39,15 +39,6 @@ out/
 # Ignore application.properties file
 src/main/resources/application-db.properties
 
-keystore-64bit.txt
-src/main/resources/keystore.p12
-keystore_base64.txt
-src/main/resources/truststore
-keystore
-sssl.cer
-dobee-web.pem
-trustServer.cer
-server
-dobee-web.ppk
-dobeeweb
-dobeeweb.pub
+dobee-bibi.pem
+Docker-compose.yml
+

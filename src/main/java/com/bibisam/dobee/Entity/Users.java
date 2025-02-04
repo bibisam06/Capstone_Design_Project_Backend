@@ -1,8 +1,7 @@
 package com.bibisam.dobee.Entity;
 
 import com.bibisam.dobee.Entity.Enum.UserStatus;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.*; //JPA패키지
 import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,8 @@ import java.util.List;
 @Entity
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Users {
 
 

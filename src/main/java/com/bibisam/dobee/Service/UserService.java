@@ -49,8 +49,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public Users save(Users users){
-        return userRepository.save(users);
+    public void save(Users users){
+        userRepository.save(users);
     }
     @Transactional
     public Users login(LoginRequest req) {
@@ -118,5 +118,9 @@ public class UserService {
             return false;
         }
         return token.getTokenValue().equals(inputCode);
+    }
+
+    public void changeStatusToPending(String userId){
+
     }
 }

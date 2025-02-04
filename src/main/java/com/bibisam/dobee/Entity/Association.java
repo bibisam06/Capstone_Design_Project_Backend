@@ -11,8 +11,8 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class Association {
 
@@ -35,7 +35,7 @@ public class Association {
     @Column(nullable = false)
     private String apartmentName;
 
-    //주소 저장
+    //주소
     @Column(name="city", nullable = false)
     private String city;
     @Column(name="district", nullable = false)
@@ -45,26 +45,34 @@ public class Association {
     @Column(name = "head_id", nullable = true)  // 실제 외래 키 컬럼
     private Integer headId;
 
+    //조합 상태
     @Enumerated(EnumType.STRING)
     private AssociationStatus status = AssociationStatus.PENDING; //초기화
 
-
+    //위도, 경도
     @Column(precision = 9, scale = 6)
     private BigDecimal longitude;
 
     @Column(precision = 9, scale = 6)
     private BigDecimal latitude;
+
     //jpa
+    //가입자 목록
     @OneToMany(mappedBy = "association")
     private List<Users> users;
 
+    //가입 승인 대기자 목록
+    @OneToMany(mappedBy = "association")
+    private List<Users> pendingUsers;
+    //조합 생성 시간
     @Column(nullable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    //조합장..
     @OneToOne
     @JoinColumn(name = "head_id", insertable = false, updatable = false)  // 중복된 컬럼에 대해 읽기 전용으로 설정
     private Users chairperson;
 
-    // Getters and setters
+
 }

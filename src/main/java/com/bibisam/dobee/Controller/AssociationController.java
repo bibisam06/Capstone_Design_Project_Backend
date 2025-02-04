@@ -45,18 +45,16 @@ public class AssociationController {
 
             // 추가 작업 (초기값 설정)
             association.setHeadId(null);
-            association.setStatus(AssociationStatus.PENDING);  // 상태 명시적으로 설정
-
+            association.setStatus(AssociationStatus.PENDING);
             // 위도/경도 값 저장 부분 (TODO로 남겨둠)
             // 예: association.setLatitude(request.getLatitude());
             // 예: association.setLongitude(request.getLongitude());
 
-            // Association 생성 성공
-            return ResponseEntity.status(HttpStatus.CREATED) // 201 상태 코드로 성공 응답
+            return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ResponseDto(201, "Association created successfully"+ association));
         } catch (Exception e) {
             // 예외 처리
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 상태 코드
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseDto(500, e.getMessage()));
         }
     }
@@ -75,16 +73,23 @@ public class AssociationController {
         return authService.isMember(userId);
     }
 
-    // 1. 조합원이 가입 요청을 보내는 API
+    // TODO : 1. 조합원이 가입 요청을 보내는 API
     @PostMapping("/request")
-    public ResponseEntity<String> requestMembership(@RequestBody AssociationJoinRequest request) {
-        Users user = userService.findByUserId(request.getUserId());
-        user.setUserStatus(UserStatus.PENDING);
-        userService.updateUser(user);
+    public ResponseEntity<String> requestMembership(@RequestBody AssociationJoinRequest request) throws InvalidAssociationException {
+        Users findUser = userService.findByUserId(request.getUserId());
+        Association asso = associationService.findById(request.getAssociationId());
+        findUser.setUserStatus(UserStatus.PENDING);
+        findUser.setAssociation(asso);
+        List<Users> pendingList = asso.getPendingUsers();
+
+        if(!pendingList.contains(findUser)){
+            pendingList.add(findUser);
+        }
+        userService.updateUser(findUser);
         return ResponseEntity.ok("join request success ");
     }
 
-    //조합 가입 승인 api
+    // TODO : 2. 조합 가입 승인 api
     @GetMapping("/approve/join")
     public ResponseEntity<String> approveToJoin(@RequestParam int associationId, String userId) {
         try{
@@ -101,13 +106,13 @@ public class AssociationController {
         }
     }
 
-    //TODO:조합 가입 거절
+    //TODO : 3. 조합 가입 거절
     @GetMapping("/decline/join")
     public void declineToJoin(@RequestParam int associationId, String userId) {
         //todo : 테이블에서 삭제(대기명단테이블)
     }
 
-    //TODO : 조합의 가입 요청 리스트 확인
+    //TODO : 4. 조합의 가입 요청 리스트 확인
     @GetMapping("/request/list")
     public ResponseEntity<List<Users>> requestList(@RequestParam int associationId) {
         try {
@@ -120,5 +125,11 @@ public class AssociationController {
         } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    //TODO : 5. 조합 탈퇴
+    @GetMapping("/delete/{id}")
+    public void signOut(@PathVariable int id) {
+
     }
 }

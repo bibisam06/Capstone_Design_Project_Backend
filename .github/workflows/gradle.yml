@@ -1,76 +1,76 @@
-name: Java CI with Gradle
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+      - filter
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      # 소스 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # GitHub Secret에서 PEM 키 불러오기
-      - name: .pem 파일 디코딩 및 설정
+      # PEM 키 설정
+      - name: Configure PEM Key
         env:
           PEM_KEY_BASE64: ${{ secrets.SSH_KEY }}
         run: |
           echo "$PEM_KEY_BASE64" | base64 --decode > dobee-web.pem
           chmod 400 dobee-web.pem
 
-#
       # JDK 17 설정
-      - name: JDK 17 설정
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'corretto'
 
       # Gradle 설정
-      - name: Gradle 설정
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4.0.0
 
-      # Gradle 실행 권한 부여
-      - name: Gradle 실행 권한 부여
-        run: chmod +x ./gradlew
+      # Gradle 실행 권한 부여 및 빌드
+      - name: Grant Gradle Permission and Build
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build -x test
 
-      # Gradle 빌드 실행
-      - name: Gradle 빌드
-        run: ./gradlew build -x test
-
-      # keystore 파일을 base64로 디코딩하여 저장
-      - name: keystore 파일 디코딩 및 업로드
+      # Keystore 파일 디코딩 및 저장
+      - name: Decode and Save Keystore File
         env:
           KEYSTORE_BASE64: ${{ secrets.EC2_KEY }}
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.p12
 
+      # Docker 이미지 빌드
+      - name: Build Docker Image
+        run: docker build -t dobee/backend:latest .
 
-      # 빌드 후 배포
-      - name: 빌드 후 배포
+      # Docker 이미지 푸시
+      - name: Push Docker Image
         run: |
-          nohup java -jar /home/ubuntu/dobee-0.0.1.SNAPSHOT.jar &
-          
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker push dobee/backend:latest
 
-
-  dependency-submission:
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    needs: build
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: JDK 17 설정
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'corretto'
-
-      - name: 의존성 그래프 생성 및 제출
-        uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      # 서버로 배포
+      - name: Deploy Application
+        run: |
+          ssh -i dobee-web.pem ubuntu@<your-server-ip> << EOF
+          docker pull dobee/backend:latest
+          docker stop dobee_backend || true
+          docker rm dobee_backend || true
+          docker run -d --name dobee_backend -p 8080:8080 dobee/backend:latest
+          EOF

@@ -10,5 +10,9 @@ public class AssociationJoinRequest {
     private String userId;
     private int associationId;
 
+    public AssociationJoinRequest(String userId, int associationId){
+        this.userId = userId;
+        this.associationId = associationId;
+    }
 
 }
