@@ -75,29 +75,24 @@ public class AssociationController {
         return authService.isMember(userId);
     }
 
-    
+
     @PostMapping("/request")
     public ResponseEntity<String> requestMembership(@RequestBody AssociationJoinRequest request) throws InvalidAssociationException {
         Users findUser = userService.findByUserId(request.getUserId());
-        Association asso = associationService.findById(request.getAssociationId());
-        findUser.setUserStatus(UserStatus.PENDING);
-        findUser.setAssociation(asso);
-        List<Users> pendingList = asso.getPendingUsers();
+        Association asso = associationService.getAssociationOrThrow(request.getAssociationId());
 
-        if(!pendingList.contains(findUser)){
-            pendingList.add(findUser);
-        }
-        else{
-            return ResponseEntity.badRequest().body("You have already Joined..");
-        }
+        userService.changeStatus(findUser, UserStatus.PENDING);
+        findUser.setAssociation(asso);
         userService.updateUser(findUser);
+
+        associationService.addPendingUser(asso, findUser);
         return ResponseEntity.ok("join request success ");
     }
 
     @GetMapping("/pendingUsers/{id}")
     public ResponseEntity<List<Users>> getPendingUsers(@PathVariable int id) throws InvalidAssociationException
     {
-        Association findAsso = associationService.findById(id);
+        Association findAsso = associationService.getAssociationOrThrow(id);
         List<Users> pendingList = findAsso.getPendingUsers();
 
         if(pendingList.isEmpty()){
@@ -107,41 +102,29 @@ public class AssociationController {
         }
     }
 
-    // TODO : 2. 조합 가입 승인 api
     @GetMapping("/approve/join")
     public boolean approveToJoin(@RequestParam int associationId, String userId) throws InvalidAssociationException {
-        Association findAsso = associationService.findById(associationId);
-        Users users = userService.findByUserId(userId);
-        List<Users> pendingList = findAsso.getPendingUsers();
-        List<Users> assoList = findAsso.getUsers();
-        users.setUserStatus(UserStatus.AFTER_JOIN);
-        userService.updateUser(users);
-        if(pendingList.isEmpty()){
-            return false;
-        }else{
-            pendingList.remove(users);
-            assoList.add(users);
+        Association findAsso = associationService.getAssociationOrThrow(associationId);
+        Users user = userService.findByUserId(userId);
 
-            return true;
-        }
+        userService.changeStatus(user, UserStatus.AFTER_JOIN);
+        associationService.removePendingUser(findAsso, user);
+        findAsso.getUsers().add(user);
+
+        return true;
     }
 
-    //TODO : 3. 조합 가입 거절
     @GetMapping("/decline/join")
     public boolean declineToJoin(@RequestParam int associationId, String userId) throws InvalidAssociationException {
-        Association findAsso = associationService.findById(associationId);
-        Users users = userService.findByUserId(userId);
-        users.setUserStatus(UserStatus.BEFORE_JOIN);
-        userService.updateUser(users);
+        Association findAsso = associationService.getAssociationOrThrow(associationId);
+        Users user = userService.findByUserId(userId);
 
-        List<Users> pendingList = findAsso.getPendingUsers();
-        if(!pendingList.contains(users)){
-            return false;
-        }else{
-            pendingList.remove(users);
-            users.setAssociation(null); //조합정보삭제
-            return true;
-        }
+        userService.changeStatus(user, UserStatus.BEFORE_JOIN);
+        associationService.removePendingUser(findAsso, user);
+        user.setAssociation(null);
+        userService.updateUser(user);
+
+        return true;
     }
 
     //TODO : 4. 조합의 가입 요청 리스트 확인

@@ -65,7 +65,6 @@ public class UserService {
         return user;
     }
 
-
     //유저 아이디 중복 확인
     public boolean checkUserExists(Integer id) {
         return userRepository.existsById(id);
@@ -120,7 +119,8 @@ public class UserService {
         return token.getTokenValue().equals(inputCode);
     }
 
-    public void changeStatusToPending(String userId){
-
+    public void changeStatus(Users users, UserStatus status){
+        users.setUserStatus(status);
+        userRepository.save(users);
     }
 }

@@ -2,6 +2,7 @@ package com.bibisam.dobee.Service;
 
 import com.bibisam.dobee.DTO.Association.AssociationRequest;
 import com.bibisam.dobee.Entity.Association;
+import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Exceptions.Association.InvalidAssociationException;
 import com.bibisam.dobee.Repository.AssociationRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +50,26 @@ public class AssociationService {
         return associationRepository.findById(associationId);
     }
 
-    public Association findById(int id) throws InvalidAssociationException {
+    public Association getAssociationOrThrow(int id) throws InvalidAssociationException {
         return associationRepository.findById(id)
-                .orElseThrow(() -> new InvalidAssociationException("Invalid Association"));
+                .orElseThrow(() -> new InvalidAssociationException("Association not found"));
+    }
+
+    public void addPendingUser(Association association, Users user) throws InvalidAssociationException {
+        List<Users> pendingList = association.getPendingUsers();
+        if (!pendingList.contains(user)) {
+            pendingList.add(user);
+        } else {
+            throw new InvalidAssociationException("User is already in pending list");
+        }
+    }
+
+    public void removePendingUser(Association association, Users user) throws InvalidAssociationException {
+        List<Users> pendingList = association.getPendingUsers();
+        if (pendingList.contains(user)) {
+            pendingList.remove(user);
+        } else {
+            throw new InvalidAssociationException("User is not in pending list");
+        }
     }
 }
