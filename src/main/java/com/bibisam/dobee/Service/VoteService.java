@@ -29,7 +29,7 @@ public class VoteService {
     public Vote ceateVote(VoteRequestDTO request) throws InvalidAssociationException {
         //TODO : 정족수 계산,  투표 종류 ( pre , post ) 하는거 -> 그리구 상태따라서 다른로직해야함..
         List<Vote_options> options = request.getOptions();
-        Association votedAssociation = associationService.findById(request.getAssociationId());
+        Association votedAssociation = associationService.getAssociationById(request.getAssociationId());
         request.setAssociation(votedAssociation);
         Vote prevote = new Vote();
         prevote = request.toEntity();

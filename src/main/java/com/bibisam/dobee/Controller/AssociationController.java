@@ -8,12 +8,10 @@ import com.bibisam.dobee.Entity.Enum.AssociationStatus;
 import com.bibisam.dobee.Entity.Enum.UserStatus;
 import com.bibisam.dobee.Entity.Users;
 import com.bibisam.dobee.Exceptions.Association.InvalidAssociationException;
-import com.bibisam.dobee.Repository.UserRepository;
 import com.bibisam.dobee.Service.AssociationService;
 import com.bibisam.dobee.Service.AuthService;
 import com.bibisam.dobee.Service.UserService;
 import com.bibisam.dobee.Service.VoteService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,7 +32,6 @@ public class AssociationController {
     private final AuthService authService;
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
 
     @PostMapping("/new/association")
@@ -42,16 +39,9 @@ public class AssociationController {
             @Valid @RequestBody AssociationRequest request) {
 
         try {
-            // 조합 생성 로직 수행
             Association association = associationService.createAssociation(request);
-
-            // 추가 작업 (초기값 설정)
-            association.setHeadId(null);
             association.setStatus(AssociationStatus.PENDING);
-            // 위도/경도 값 저장 부분 (TODO로 남겨둠)
-            // 예: association.setLatitude(request.getLatitude());
-            // 예: association.setLongitude(request.getLongitude());
-
+            associationService.update(association);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ResponseDto(201, "Association created successfully"+ association));
         } catch (Exception e) {
@@ -69,7 +59,6 @@ public class AssociationController {
         return ResponseEntity.ok(list);
     }
 
-    //가입여부확인 -> 첫화면
     @GetMapping("/is/member")
     public boolean isMember(@RequestParam String userId){
         return authService.isMember(userId);
@@ -79,7 +68,7 @@ public class AssociationController {
     @PostMapping("/request")
     public ResponseEntity<String> requestMembership(@RequestBody AssociationJoinRequest request) throws InvalidAssociationException {
         Users findUser = userService.findByUserId(request.getUserId());
-        Association asso = associationService.getAssociationOrThrow(request.getAssociationId());
+        Association asso = associationService.getAssociationById(request.getAssociationId());
 
         userService.changeStatus(findUser, UserStatus.PENDING);
         findUser.setAssociation(asso);
@@ -90,9 +79,9 @@ public class AssociationController {
     }
 
     @GetMapping("/pendingUsers/{id}")
-    public ResponseEntity<List<Users>> getPendingUsers(@PathVariable int id) throws InvalidAssociationException
+    public ResponseEntity<List<Users>> getPendingUsers(@PathVariable int id)
     {
-        Association findAsso = associationService.getAssociationOrThrow(id);
+        Association findAsso = associationService.getAssociationById(id);
         List<Users> pendingList = findAsso.getPendingUsers();
 
         if(pendingList.isEmpty()){
@@ -102,21 +91,22 @@ public class AssociationController {
         }
     }
 
-    @GetMapping("/approve/join")
+    @PatchMapping("/approve/join")
     public boolean approveToJoin(@RequestParam int associationId, String userId) throws InvalidAssociationException {
-        Association findAsso = associationService.getAssociationOrThrow(associationId);
+        Association findAsso = associationService.getAssociationById(associationId);
         Users user = userService.findByUserId(userId);
 
         userService.changeStatus(user, UserStatus.AFTER_JOIN);
         associationService.removePendingUser(findAsso, user);
+        associationService.addUser(findAsso, user);
         findAsso.getUsers().add(user);
 
         return true;
     }
 
-    @GetMapping("/decline/join")
+    @PatchMapping("/decline/join")
     public boolean declineToJoin(@RequestParam int associationId, String userId) throws InvalidAssociationException {
-        Association findAsso = associationService.getAssociationOrThrow(associationId);
+        Association findAsso = associationService.getAssociationById(associationId);
         Users user = userService.findByUserId(userId);
 
         userService.changeStatus(user, UserStatus.BEFORE_JOIN);
@@ -127,24 +117,20 @@ public class AssociationController {
         return true;
     }
 
-    //TODO : 4. 조합의 가입 요청 리스트 확인
     @GetMapping("/request/list")
     public ResponseEntity<List<Users>> requestList(@RequestParam int associationId) {
-        try {
-            List<Users> userList = userService.findByAssociation(associationId);
-
-
-            return ResponseEntity.ok(userList);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e){
-            return ResponseEntity.badRequest().build();
-        }
+       Association association = associationService.getAssociationById(associationId);
+       List<Users> assoList = association.getPendingUsers();
+       return ResponseEntity.ok(assoList);
     }
 
-    //TODO : 5. 조합 탈퇴
-    @GetMapping("/delete/{id}")
-    public void signOut(@PathVariable int id) {
+    @DeleteMapping("/signout")
+    public boolean signOut(@RequestParam int associationId, String userId) throws InvalidAssociationException {
+        Users user = userService.findByUserId(userId);
+        Association findAsso = associationService.getAssociationById(associationId);
 
+        associationService.removeUser(findAsso, user);
+        user.setAssociation(null);
+        return true;
     }
 }

@@ -35,12 +35,14 @@ public class AssociationRequest {
     }
 
     @Builder
-    public AssociationRequest(String name,String city, String district, String houseNumber, String apartmentName) {
+    public AssociationRequest(String name,String city, String district, String houseNumber, String apartmentName, BigDecimal longitude, BigDecimal latitude) {
         this.name = name;
         this.city = city;
         this.district = district;
         this.houseNumber = houseNumber;
         this.apartmentName = apartmentName;
+        this.longitude = longitude;
+        this.latitude = latitude;
 
     }
 

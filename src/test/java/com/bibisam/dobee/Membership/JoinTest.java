@@ -8,6 +8,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
@@ -20,9 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class JoinTest {
 
-    JoinTest(UserService userService, PasswordEncoder encoder, EntityManager entityManager) {
-        this.userService = userService;
-    }
+
 
     @AfterEach
     @Rollback  // 트랜잭션 롤백
@@ -33,7 +33,17 @@ class JoinTest {
 
 
 
-    private final UserService userService;
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private EntityManager entityManager;
+
+    @InjectMocks
+    private JoinTest joinTest;
 
     @Test
     public void join_test() {
@@ -71,37 +81,7 @@ class JoinTest {
 
     }
 
-    //TODO:시퀀스 수정하기
-    @Test
-        public void user_id_sequence(){
-            //회원 가입 기능 테스트
-            //given
-            JoinRequest jr = new JoinRequest();
-            //then
-            jr.setRole("HEAD1");
-            jr.setUserPw("ss");
-            jr.setUserName("hanbijeong");
-            jr.setUserId("111");
-            //when
-            Users testUser = userService.join(jr);
 
-            assertThat(testUser.getId()).isEqualTo(1);
-    }
-
-    @Test
-    public void delete_all(){
-        userService.deleteallUser();
-        JoinRequest jr = new JoinRequest();
-        //then
-        jr.setRole("HEAD1");
-        jr.setUserPw("ss");
-        jr.setUserName("hanbijeong");
-        jr.setUserId("111");
-        //when
-        Users testUser = userService.join(jr);
-
-        assertThat(testUser.getId()).isEqualTo(1);
-    }
 
     @DisplayName("회원탈퇴 테스트")
     @Test

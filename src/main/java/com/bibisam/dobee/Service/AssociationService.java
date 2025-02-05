@@ -22,14 +22,16 @@ public class AssociationService {
     }
 
 
-
-    //모든 조합 조회 가능.
     public List<Association> getAllAssociations() {
         return associationRepository.findAll();
     }
 
     public Association createAssociation(AssociationRequest request) {
         return associationRepository.save(request.toEntity());
+    }
+
+    public Association update(Association association){
+        return associationRepository.save(association);
     }
 
     public void deleteAll(){
@@ -46,13 +48,9 @@ public class AssociationService {
         //투표가 완료되었을 경우,
     }
 
-    public Optional<Association> getAssociationById(int associationId) {
-        return associationRepository.findById(associationId);
-    }
-
-    public Association getAssociationOrThrow(int id) throws InvalidAssociationException {
-        return associationRepository.findById(id)
-                .orElseThrow(() -> new InvalidAssociationException("Association not found"));
+    public Association getAssociationById(int associationId) {
+        Optional<Association> asso =  associationRepository.findById(associationId);
+        return asso.orElse(null);
     }
 
     public void addPendingUser(Association association, Users user) throws InvalidAssociationException {
@@ -70,6 +68,25 @@ public class AssociationService {
             pendingList.remove(user);
         } else {
             throw new InvalidAssociationException("User is not in pending list");
+        }
+    }
+
+    public void removeUser(Association association, Users user) throws InvalidAssociationException {
+        List<Users> userList = association.getUsers();
+        if(userList.contains(user)){
+            userList.remove(user);
+        }else{
+            throw new InvalidAssociationException("User is not in user list");
+        }
+    }
+
+    public void addUser(Association association, Users user)
+    throws InvalidAssociationException {
+        List<Users> userList = association.getUsers();
+        if (!userList.contains(user)) {
+            userList.add(user);
+        }else{
+            throw new InvalidAssociationException("User is already in user list");
         }
     }
 }
