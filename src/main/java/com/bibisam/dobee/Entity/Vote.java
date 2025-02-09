@@ -45,6 +45,9 @@ public class Vote {
     @Column(name = "valid", nullable = true)
     private boolean valid; // 유효/무효 투표 여부 -> null 초기에 저장 되고, 실제 투표 종료 시 true or false 저장될 것..
 
+//    @Column(name = "result", nullable = true)
+//    private Vote_options options;
+
     //JPA MAPPING 연관 관계
     @ManyToOne
     @JoinColumn(name="created_by")

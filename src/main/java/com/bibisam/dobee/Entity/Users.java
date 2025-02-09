@@ -55,8 +55,7 @@ public class Users {
     @OneToMany(mappedBy = "users")
     private final List<Vote> usersList = new ArrayList<Vote>();
 
-    @OneToMany(mappedBy = "users")
-    private final List<User_myvote> voteList = new ArrayList<User_myvote>();
+
 
     @ManyToOne
     @JoinColumn(name = "association_id")  // UnionTable과의 외래 키

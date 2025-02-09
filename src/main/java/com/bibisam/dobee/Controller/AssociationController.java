@@ -117,12 +117,7 @@ public class AssociationController {
         return true;
     }
 
-    @GetMapping("/request/list")
-    public ResponseEntity<List<Users>> requestList(@RequestParam int associationId) {
-       Association association = associationService.getAssociationById(associationId);
-       List<Users> assoList = association.getPendingUsers();
-       return ResponseEntity.ok(assoList);
-    }
+
 
     @DeleteMapping("/signout")
     public boolean signOut(@RequestParam int associationId, String userId) throws InvalidAssociationException {
