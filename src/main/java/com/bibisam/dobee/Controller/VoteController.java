@@ -50,6 +50,7 @@ public class VoteController {
         }
     }
 
+    //투표하기
     @PostMapping("/voting/{voteId}")
     public ResponseEntity<ResponseDto> participateVote(@PathVariable Integer voteId, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -67,7 +68,7 @@ public class VoteController {
         }
     }
 
-//    //TODO : myVote
+//    //TODO : myvote -> 내 투표 보기
 //    @GetMapping("/myvote")
 //    public ResponseEntity<List<V>> myVote(HttpServletRequest request){
 //
@@ -83,5 +84,24 @@ public class VoteController {
 //        List<User_myvote> myVoteList = findUser.getVoteList();
 //        return ResponseEntity.ok(myVoteList);
 //    }
+
+    // TODO : 정족수 계산하기 .. -> 유무효 판단하는 api
+    @GetMapping("/quorum")
+    public void calculatequroum(){
+
+    }
+
+    // TODO : 투표 결과 조회
+    @GetMapping("/result")
+    public void getResult(){
+
+    }
+    // TODO : 남은 시간 조회하는 api
+    @GetMapping("/time/left/{id}")
+    public void timeLeft(@PathVariable Integer id){
+
+    }
+
+
 
 }

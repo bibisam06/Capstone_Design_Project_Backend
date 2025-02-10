@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -30,7 +31,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final PasswordEncoder encoder;
+    @Autowired
+    private PasswordEncoder encoder;
 
     private final AssociationRepository associationRepository;
 
@@ -64,7 +66,6 @@ public class UserService {
         }
         return user;
     }
-
 
     //유저 아이디 중복 확인
     public boolean checkUserExists(Integer id) {
@@ -120,7 +121,8 @@ public class UserService {
         return token.getTokenValue().equals(inputCode);
     }
 
-    public void changeStatusToPending(String userId){
-
+    public void changeStatus(Users users, UserStatus status){
+        users.setUserStatus(status);
+        userRepository.save(users);
     }
 }

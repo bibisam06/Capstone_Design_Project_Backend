@@ -60,7 +60,7 @@ public class AssociationJoinTest {
         mockAssociation.setPendingUsers(new ArrayList<>());
 
         given(userService.findByUserId("jade")).willReturn(mockUser);
-        given(associationService.findById(100)).willReturn(mockAssociation);
+        given(associationService.getAssociationById(100)).willReturn(mockAssociation);
 
         //when
         mockMvc.perform(get("/api/users/1")

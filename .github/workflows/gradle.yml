@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - filter
+      - feature
   pull_request:
     branches:
       - main
@@ -33,6 +34,14 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
+      # 환경별 yml 파일 생성(2) - dev
+      - name: make application.properties
+        run: |
+          cd ./src/main/resources
+          touch ./application-dev.yml
+          echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
+        shell: bash
+
       # Gradle 설정
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4.0.0
@@ -50,15 +59,19 @@ jobs:
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.p12
 
-      # Docker 이미지 빌드
-      - name: Build Docker Image
-        run: docker build -t dobee/backend:latest .
-
-      # Docker 이미지 푸시
-      - name: Push Docker Image
+      # docker build & push to production
+      - name: Docker build & push to prod
         run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker push dobee/backend:latest
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/docker-test-prod .  # Dockerfile-dev 파일이 존재하는지 확인
+          docker push ${{ secrets.DOCKER_USERNAME }}/docker-test-prod
+
+      # docker build & push to develop
+      - name: Docker build & push to hub
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_USERNAME }}/latest .  # Dockerfile-dev 파일이 존재하는지 확인
+          docker push ${{ secrets.DOCKER_USERNAME }}/latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -68,9 +81,9 @@ jobs:
       # 서버로 배포
       - name: Deploy Application
         run: |
-          ssh -i dobee-web.pem ubuntu@<your-server-ip> << EOF
-          docker pull dobee/backend:latest
+          ssh -i dobee-web.pem ubuntu@${{secrets.SERVER_IP}} << EOF
+          docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
           docker stop dobee_backend || true
           docker rm dobee_backend || true
-          docker run -d --name dobee_backend -p 8080:8080 dobee/backend:latest
+          docker run -i -t -p 8080:8080 --name dobee_backend ${{ secrets.DOCKER_USERNAME }}/backend:latest
           EOF

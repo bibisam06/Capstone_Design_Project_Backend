@@ -39,6 +39,9 @@ out/
 # Ignore application.properties file
 src/main/resources/application-db.properties
 
+original.pem
+private.key
+keystore.p12
 dobee-bibi.pem
 Docker-compose.yml
 

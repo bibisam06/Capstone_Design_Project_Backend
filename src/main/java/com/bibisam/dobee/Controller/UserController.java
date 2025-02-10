@@ -75,6 +75,7 @@ public class UserController {
 
         System.out.println(request.getSession().getAttribute("loginUser"));
         response.put("user", userId);
+        response.put("sessionId",request.getSession().getId());
         response.put("request", request.getSession().getAttribute("loginUser"));
         return ResponseEntity.ok(response);
     }
@@ -102,8 +103,10 @@ public class UserController {
 
     }
     //로그아웃
+
+    //TODO : 403 뜬다고 함 -> 브라우저에서 ..
     @GetMapping("/logout")
-    public ResponseEntity<Map<String,Object>> sessionLogout(HttpSession session) throws Exception{
+    public ResponseEntity<Map<String,Object>> sessionLogout(HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try{
             if(session != null) {
@@ -118,7 +121,7 @@ public class UserController {
         }
     }
 
-    //회원탈퇴 TODO : 반환값 주기
+    // TODO : 반환값 주기
     @Transactional
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable String  id){
