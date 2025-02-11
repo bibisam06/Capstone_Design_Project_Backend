@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@ControllerAdvice
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/association")
@@ -51,13 +51,7 @@ public class AssociationController {
         }
     }
     
-    @GetMapping("/check-to-join")
-    public ResponseEntity<List<Association>> requestToJoin() {
 
-
-        List<Association> list = associationService.getAllAssociations();
-        return ResponseEntity.ok(list);
-    }
 
     @GetMapping("/is/member")
     public boolean isMember(@RequestParam String userId){

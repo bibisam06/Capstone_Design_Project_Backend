@@ -11,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig{
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -25,8 +25,8 @@ public class SecurityConfig {
                 .csrf(csrfConfigurer -> csrfConfigurer.disable()) // CSRF 보호 비활성화
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/user/**", "/api/vote/**", "/api/association/**").permitAll()
-                                .anyRequest().authenticated()
+                                .requestMatchers("api/auth/**","/api/vote/**","/api/check/**").permitAll()
+                                .requestMatchers("/api/association/**","api/user/**").authenticated()
                 )
 //                .exceptionHandling(exceptionHandling ->
 //                        exceptionHandling
